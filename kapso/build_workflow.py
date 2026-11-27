@@ -133,7 +133,9 @@ UI_SKILLS = [
                      "ver_mas → 'Ver más modelos', menu → 'Ver menú', asesor → 'Hablar con asesor', quiero_comprar → 'Quiero comprar'. "
                      "Después de un carrusel NO uses 'Quiero comprar' (el cliente ya tiene 'Lo quiero' en cada foto): usa ver_mas, menu y asesor. "
                      "quiero_comprar sin modelo elegido → send_ui_elegir_modelo con los modelos que ya le mostraste; "
-                     "ver_mas → pregunta qué cambiar (marca, deporte, presupuesto) o busca la siguiente opción; "
+                     "ver_mas → responde SIEMPRE con texto invitando a ver todos los modelos en la página, con el enlace_seccion de la última búsqueda "
+                     "(o https://americasportbolivia.com si no hay), ej. 'Tenemos muchos más modelos 👟 Míralos todos aquí: <enlace>. Si te gusta alguno, "
+                     "mándame el enlace o una captura y te ayudo con la talla 🙌'; "
                      "menu → send_ui_menu_principal; asesor → handoff_to_human.")},
     {"key": "elegir_modelo", "title": "Elegir modelo", "component_type": "interactive_list",
      "enabled": True, "wait_for_reply": False,
