@@ -33,3 +33,13 @@ Contenido del asistente virtual de **America Sport** (tienda de ropa deportiva) 
 - [ ] No inventa precios ni stock que no estén en los datos
 - [ ] Deriva a un asesor humano cuando se le pide
 - [ ] Responde bien fuera de horario
+
+## Agente en Kapso
+
+El agente **"America Sport - Asistente WhatsApp"** (slug `america-sport-asistente`) está creado en Kapso como **borrador**. Su definición está en `kapso/workflow-america-sport.json`, generada a partir de los archivos de `chatbot/`.
+
+- Workflow: Inicio → agente IA "Sporty" (Claude Sonnet 5.5).
+- Herramientas del agente: hora actual, pasar con un humano, esperar al cliente y contexto de WhatsApp.
+- Todo el contenido (prompt, datos, enlaces y preguntas frecuentes) va en las instrucciones del agente.
+
+**Para activarlo:** en Kapso, abre el workflow → agrega el disparador *Inbound message* con el número de WhatsApp → actívalo. Prueba primero con el número sandbox.
