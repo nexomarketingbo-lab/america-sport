@@ -1,44 +1,33 @@
 # Datos de la tienda – America Sport
 
-> Reemplazar cada `[COMPLETAR]` con el dato real antes de subirlo a Kapso.
-
 ## General
 - **Nombre:** America Sport
-- **Rubro:** Ropa, calzado y accesorios deportivos
-- **Ciudad:** [COMPLETAR]
-- **Dirección:** [COMPLETAR]
-- **Google Maps:** [COMPLETAR: enlace]
-- **WhatsApp:** [COMPLETAR]
-- **Instagram / Facebook / TikTok:** [COMPLETAR]
+- **Rubro:** Calzado, ropa y accesorios deportivos (y casual)
+- **Dirección:** Calle Colón #130, Santa Cruz de la Sierra, Bolivia
+- **Google Maps:** https://maps.app.goo.gl/MiKgaevYmwHoAXeU9
+- **Celular / WhatsApp:** +591 72181658
+- **Teléfono fijo:** (3) 336-1855
+- **Página web (catálogo):** https://americasportbolivia.com
+- **Facebook:** https://www.facebook.com/amesportbo
 
 ## Horarios de atención
-- Lunes a viernes: [COMPLETAR]
-- Sábado: [COMPLETAR]
-- Domingo y feriados: [COMPLETAR]
-
-## Categorías de productos
-- Camisetas de fútbol (selecciones y clubes): [COMPLETAR: sí/no, cuáles]
-- Ropa de entrenamiento (poleras, shorts, buzos, calzas)
-- Calzado deportivo (running, fútbol, casual)
-- Accesorios (gorras, medias, mochilas, balones)
-- Uniformes personalizados para equipos: [COMPLETAR: sí/no]
-- Marcas: [COMPLETAR]
+- Lunes a sábado: 9:00 a 20:00
+- Domingo: 10:00 a 14:00
 
 ## Métodos de pago
-- Efectivo en tienda: [COMPLETAR]
-- QR (transferencia bancaria): [COMPLETAR: banco]
-- Tarjeta de débito/crédito en tienda: [COMPLETAR]
-- Pago contra entrega: [COMPLETAR]
+- **Solo pago por QR.**
 
 ## Envíos
-- Envío local en [COMPLETAR: ciudad]: [COMPLETAR: costo y plazo]
-- Envíos a otros departamentos: [COMPLETAR: empresa de envío, costo y plazo]
-- Recojo en tienda: gratis, en horario de atención.
+- [COMPLETAR: ¿hacen envíos? costo y plazo en Santa Cruz y a otros departamentos]. Mientras no esté definido, el bot deriva a un asesor.
 
 ## Cambios y devoluciones
-- Plazo para cambios: [COMPLETAR: p. ej. 7 días]
-- Condiciones: producto sin uso, con etiqueta y comprobante de compra.
-- Devoluciones de dinero: [COMPLETAR: sí/no]
+- **Cambios:** se puede cambiar por otro modelo, **todas las tardes**.
+- **Devoluciones de dinero:** **no hay devoluciones.**
 
-## Promociones vigentes
-- [COMPLETAR o dejar "Ninguna por ahora"]
+## Uniformes personalizados
+- **No** hacemos uniformes personalizados.
+
+## Productos, marcas y precios
+- Todo el catálogo, con precios, colores y tallas, está en la página web.
+- Cada producto muestra **Precio Normal** y, si tiene descuento, **Precio Oferta** (en Bs).
+- Ver `enlaces-catalogo.md` para los enlaces de cada sección.

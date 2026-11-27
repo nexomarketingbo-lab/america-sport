@@ -1,40 +1,37 @@
 # Preguntas frecuentes – America Sport
 
 ## ¿Dónde están ubicados?
-Estamos en [COMPLETAR: dirección], [COMPLETAR: ciudad]. Aquí la ubicación: [COMPLETAR: enlace de Maps] 📍
+Estamos en **Calle Colón #130**, Santa Cruz de la Sierra 📍 https://maps.app.goo.gl/MiKgaevYmwHoAXeU9
 
 ## ¿Cuál es su horario?
-Atendemos de lunes a viernes de [COMPLETAR], sábados de [COMPLETAR]. [COMPLETAR: domingos].
+Lunes a sábado de 9:00 a 20:00 y domingos de 10:00 a 14:00.
 
-## ¿Cuánto cuesta / tienen stock de…?
-Para darte el precio y la disponibilidad exactos, dime el producto, la talla y el color (o mándame una foto o captura) y te lo confirmo con un asesor 🙌
+## ¿Tienen / cuánto cuesta…?
+Mandar el enlace del modelo o de la sección (ver `enlaces-catalogo.md`). Ahí están los precios, colores y tallas. Para confirmar stock en tu talla, pasa con un asesor.
 
-## ¿Hacen envíos?
-¡Sí! En [COMPLETAR: ciudad] el envío cuesta [COMPLETAR] y llega en [COMPLETAR]. A otros departamentos enviamos por [COMPLETAR]. También puedes recoger gratis en la tienda.
+## ¿Tienen catálogo?
+¡Sí! Todo nuestro catálogo está en https://americasportbolivia.com 👟 Puedes filtrar por marca, deporte, talla y precio.
+
+## ¿Qué marcas tienen?
+Adidas, Nike, Puma, Reebok, New Balance, Under Armour, Asics, Fila, Umbro, Penalty, Kelme, Olympikus, Vans, Crocs, Havaianas y muchas más. Mandar el enlace de la marca que pidan.
 
 ## ¿Cómo puedo pagar?
-Aceptamos [COMPLETAR: efectivo, QR, tarjeta]. Para pedidos con envío, el pago se hace [COMPLETAR: por adelantado con QR / contra entrega].
-
-## ¿Qué talla me queda?
-Guía general (puede variar según la marca):
-
-| Talla | Pecho (cm) | Cintura (cm) |
-|---|---|---|
-| S | 86–94 | 71–79 |
-| M | 94–102 | 79–87 |
-| L | 102–110 | 87–95 |
-| XL | 110–118 | 95–103 |
-
-Si estás entre dos tallas, te recomendamos la más grande. Para calzado, dime cuánto mides de pie (en cm) o tu talla habitual. [COMPLETAR: ajustar con la tabla real de la tienda]
+El pago es solo por **QR**. Un asesor te envía el QR al confirmar tu pedido.
 
 ## ¿Puedo cambiar un producto?
-Sí, dentro de [COMPLETAR] días, sin uso, con etiqueta y con tu comprobante. Escríbenos y te ayudamos con el cambio.
+Sí 🙌 Puedes cambiarlo por otro modelo **cualquier tarde** en la tienda. Ten en cuenta que **no hacemos devoluciones de dinero**.
 
-## ¿Hacen uniformes para equipos?
-[COMPLETAR: Sí, hacemos uniformes personalizados con nombre y número. Te paso con un asesor para cotizar.]
+## ¿Me devuelven el dinero?
+Lo sentimos, no hacemos devoluciones de dinero, pero sí puedes **cambiarlo por otro modelo** cualquier tarde en la tienda.
 
-## ¿Venden al por mayor?
-[COMPLETAR] — Para pedidos al por mayor te paso con un asesor para darte precios especiales.
+## ¿Hacen uniformes personalizados?
+No hacemos uniformes personalizados, pero tenemos poleras de equipo y ropa deportiva: https://americasportbolivia.com/index.php?familia=POLERAS%20EQUI
 
-## ¿Las camisetas son originales?
-[COMPLETAR: respuesta honesta según el producto: originales / versión hincha / réplica]
+## ¿Hacen envíos?
+[COMPLETAR] — Por ahora: "Te paso con un asesor para coordinar el envío 👌"
+
+## ¿Hay ofertas?
+¡Sí! 🔥 Mira las ofertas aquí: https://americasportbolivia.com/index.php?oferta=1
+
+## ¿Qué talla me queda?
+Cada producto muestra sus tallas disponibles en la página. Si tienes dudas entre dos tallas, un asesor te ayuda a elegir.
