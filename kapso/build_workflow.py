@@ -8,6 +8,11 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 MODELO_CLAUDE_SONNET_5_5 = "1caa3ea4-b319-462b-abae-025bcfdd8cf1"
 FUNCION_BUSCAR_PRODUCTOS = "6e5893e1-577b-4bd7-b198-76271747851f"
 FUNCION_FILTRO_NUMEROS = "8305cf42-2f0f-4a87-816e-9599d4303de2"  # kapso/functions/filtro-numeros
+NUMERO_TIENDA = "1362454746955581"        # +591 57358527 (America Sport)
+ENCARGADO = "59175389125"                 # recibe el aviso de cada modelo elegido
+PLANTILLA_AVISO_ENCARGADO = "1140906348851594"  # plantilla Meta "aviso_encargado_pedido"
+# La plantilla debe estar aprobada por Meta y sincronizada en Kapso antes de activar el aviso.
+USAR_AVISO = __import__("os").environ.get("USAR_AVISO", "1") == "1"
 
 def leer(nombre):
     return (ROOT / "chatbot" / nombre).read_text(encoding="utf-8")
@@ -23,7 +28,8 @@ HERRAMIENTAS = """
 ## Herramientas
 - `buscar_productos`: úsala SIEMPRE antes de mandar un enlace de productos (ver regla principal).
 - `get_current_datetime`: para saber si la tienda está abierta. La tienda está en Bolivia (hora UTC-4).
-- `handoff_to_human`: para pasar con un asesor (incluye un resumen breve en el motivo).
+- `handoff_to_human`: para pasar con un asesor en reclamos, envíos o cuando lo pidan (incluye un resumen breve en el motivo).
+- `save_variable` + `complete_task`: cuando el cliente elige un modelo (ver esa sección).
 - `enter_waiting`: después de responder o preguntar algo al cliente (sin botones), para esperar su siguiente mensaje.
 - Formato WhatsApp: negritas con *un asterisco*, nada de tablas ni encabezados markdown. Envía los enlaces completos tal cual.
 """
@@ -94,7 +100,7 @@ UI_SKILLS = [
      "instruction": ("Al terminar de mostrar productos o responder una consulta, para ofrecer el siguiente paso. "
                      "body: pregunta corta, ej. '¿Te gustó alguno? Dime talla y color, o elige:'. Botones (id → title), elige 2 o 3: "
                      "quiero_comprar → 'Quiero comprar', ver_mas → 'Ver más modelos', menu → 'Ver menú', asesor → 'Hablar con asesor'. "
-                     "quiero_comprar → pide modelo, talla y color y luego handoff_to_human con el resumen; ver_mas → pregunta qué cambiar "
+                     "quiero_comprar → sigue \"Cuando el cliente elige un modelo\"; ver_mas → pregunta qué cambiar "
                      "(marca, deporte, precio) y vuelve a buscar; menu → send_ui_menu_principal; asesor → handoff_to_human.")},
 ]
 
@@ -124,13 +130,33 @@ workflow = {"workflow": {
                  "temperature": 0.3,
                  "message_delivery_mode": "auto_send_assistant_text",
                  "enabled_default_tools": ["get_current_datetime", "handoff_to_human", "enter_waiting",
-                                           "get_whatsapp_context", "complete_task"],
+                                           "get_whatsapp_context", "complete_task", "save_variable"],
                  "flow_agent_function_tools": [herramienta_buscar],
                  "ui_skills": UI_SKILLS,
              }}},
+            # Cliente eligió un modelo → avisar al encargado (si la plantilla está aprobada) → pasar a humano.
+            *([{"id": "aviso_encargado", "type": "flow-node", "position": {"x": 950, "y": 50},
+                "data": {"node_type": "send_template", "display_name": "Aviso al encargado", "config": {
+                    "template_id": PLANTILLA_AVISO_ENCARGADO,
+                    "phone_number_id": NUMERO_TIENDA,
+                    "to_phone_number": ENCARGADO,
+                    "parameters": [{"type": "BODY", "parameters": [
+                        {"type": "text", "parameter_name": "cliente", "text": "{{vars.cliente_nombre}}"},
+                        {"type": "text", "parameter_name": "telefono", "text": "+{{context.phone_number}}"},
+                        {"type": "text", "parameter_name": "modelo", "text": "{{vars.pedido_modelo}}"},
+                        {"type": "text", "parameter_name": "detalle", "text": "{{vars.pedido_detalle}}"},
+                        {"type": "text", "parameter_name": "enlace", "text": "{{vars.pedido_enlace}}"},
+                    ]}],
+                }}}] if USAR_AVISO else []),
+            {"id": "confirmar_stock", "type": "flow-node", "position": {"x": 1250, "y": 50},
+             "data": {"node_type": "handoff", "display_name": "Encargado confirma stock", "config": {
+                 "reason": "Cliente eligió un modelo: confirmar disponibilidad"}}},
         ],
         "edges": [{"source": "start", "target": "filtro_numeros", "label": "next"},
-                  {"source": "filtro_numeros", "target": "sporty", "label": "autorizado"}],
+                  {"source": "filtro_numeros", "target": "sporty", "label": "autorizado"},
+                  *([{"source": "sporty", "target": "aviso_encargado", "label": "next"},
+                     {"source": "aviso_encargado", "target": "confirmar_stock", "label": "next"}] if USAR_AVISO
+                    else [{"source": "sporty", "target": "confirmar_stock", "label": "next"}])],
     },
 }}
 
