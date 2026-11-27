@@ -18,6 +18,8 @@ ENCARGADO = "59175389125"                 # recibe el aviso de cada modelo elegi
 PLANTILLA_AVISO_ENCARGADO = "8223f293-6de1-4305-bb7a-e1caf35d5f0e"  # id Kapso de la plantilla "aviso_encargado_pedido" (Meta 1140906348851594)
 # La plantilla debe estar aprobada por Meta y sincronizada en Kapso antes de activar el aviso.
 USAR_AVISO = __import__("os").environ.get("USAR_AVISO", "1") == "1"
+# Filtro de números (solo responder a números de prueba). Desactivado: el bot atiende a todos los clientes.
+USAR_FILTRO = __import__("os").environ.get("USAR_FILTRO", "0") == "1"
 
 def leer(nombre):
     return (ROOT / "chatbot" / nombre).read_text(encoding="utf-8")
@@ -131,7 +133,7 @@ workflow = {"workflow": {
             {"id": "start", "type": "flow-node", "position": {"x": 100, "y": 100},
              "data": {"node_type": "start", "config": {}, "display_name": "Inicio"}},
             # Solo los números de kapso/functions/filtro-numeros pasan al agente.
-            {"id": "filtro_numeros", "type": "flow-node", "position": {"x": 350, "y": 100},
+            *([{"id": "filtro_numeros", "type": "flow-node", "position": {"x": 350, "y": 100},
              "data": {"node_type": "decide", "display_name": "Filtro de números", "config": {
                  "decision_type": "function",
                  "function_id": FUNCION_FILTRO_NUMEROS,
@@ -140,7 +142,7 @@ workflow = {"workflow": {
                      {"label": "no_autorizado", "description": "Cualquier otro número: no se responde"},
                  ],
                  "llm_configuration": {},
-             }}},
+             }}}] if USAR_FILTRO else []),
             {"id": "sporty", "type": "flow-node", "position": {"x": 650, "y": 50},
              "data": {"node_type": "agent", "display_name": "Asistente de America Sport (IA)", "config": {
                  "system_prompt": system,
@@ -195,8 +197,9 @@ workflow = {"workflow": {
              "data": {"node_type": "handoff", "display_name": "Encargado confirma stock", "config": {
                  "reason": "Cliente eligió un modelo: confirmar disponibilidad"}}},
         ],
-        "edges": [{"source": "start", "target": "filtro_numeros", "label": "next"},
-                  {"source": "filtro_numeros", "target": "sporty", "label": "autorizado"},
+        "edges": [*([{"source": "start", "target": "filtro_numeros", "label": "next"},
+                     {"source": "filtro_numeros", "target": "sporty", "label": "autorizado"}] if USAR_FILTRO
+                    else [{"source": "start", "target": "sporty", "label": "next"}]),
                   {"source": "sporty", "target": "ruta_agente", "label": "next"},
                   *([{"source": "ruta_agente", "target": "aviso_encargado", "label": "pedido"},
                      {"source": "aviso_encargado", "target": "confirmar_stock", "label": "next"}] if USAR_AVISO

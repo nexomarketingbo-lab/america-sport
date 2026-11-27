@@ -19,33 +19,6 @@
           }
         },
         {
-          "id": "filtro_numeros",
-          "type": "flow-node",
-          "position": {
-            "x": 350,
-            "y": 100
-          },
-          "data": {
-            "node_type": "decide",
-            "display_name": "Filtro de números",
-            "config": {
-              "decision_type": "function",
-              "function_id": "8305cf42-2f0f-4a87-816e-9599d4303de2",
-              "conditions": [
-                {
-                  "label": "autorizado",
-                  "description": "El número está en la lista permitida"
-                },
-                {
-                  "label": "no_autorizado",
-                  "description": "Cualquier otro número: no se responde"
-                }
-              ],
-              "llm_configuration": {}
-            }
-          }
-        },
-        {
           "id": "sporty",
           "type": "flow-node",
           "position": {
@@ -370,13 +343,8 @@
       "edges": [
         {
           "source": "start",
-          "target": "filtro_numeros",
-          "label": "next"
-        },
-        {
-          "source": "filtro_numeros",
           "target": "sporty",
-          "label": "autorizado"
+          "label": "next"
         },
         {
           "source": "sporty",

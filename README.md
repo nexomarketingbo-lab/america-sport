@@ -36,12 +36,12 @@ Contenido del asistente virtual de **America Sport** (tienda de ropa deportiva) 
 
 ## Agente en Kapso
 
-El agente **"America Sport - Asistente WhatsApp"** (slug `america-sport-asistente`) está creado en Kapso como **borrador**.
+El agente **"America Sport - Asistente WhatsApp"** (slug `america-sport-asistente`) está **activo** en Kapso, en el número **+591 57358527**.
 
-- Workflow: Inicio → **filtro de números** → agente IA "Asistente de America Sport" (Claude Sonnet 5.5) → *(cliente elige un modelo)* → **aviso al encargado** (+591 75389125) → **pasa a humano** para confirmar stock.
+- Workflow: Inicio → agente IA "Asistente de America Sport" (Claude Sonnet 5.5) → *(cliente elige un modelo)* → **aviso al encargado** (+591 75389125) → **pasa a humano** para confirmar stock.
 - **Seguimiento:** después de cada respuesta del asistente, el flujo espera. Si el cliente no contesta en **2 h**, se le manda un mensaje de seguimiento (uno solo); si sigue sin contestar 20 h más, la conversación se cierra. Tiempos y texto en `kapso/build_workflow.py` (`ESPERA_SEGUIMIENTO_SEG`, `SEGUIMIENTO`). La función `kapso/functions/ruta-conversacion` decide cada camino.
 - **Aviso al encargado:** plantilla de Meta `aviso_encargado_pedido` (cliente, teléfono, modelo, talla/color, enlace). Aprobada por Meta y activa. El nodo usa el id interno de Kapso de la plantilla (`PLANTILLA_AVISO_ENCARGADO`), que se obtiene agregando un nodo "Send template" en el lienzo y leyendo la definición.
-- **Filtro de números** (`kapso/functions/filtro-numeros/index.js`): por ahora el bot solo responde a **+591 77213515** y **+591 72181658**. Otros números no reciben respuesta automática (sus mensajes quedan en la bandeja de Kapso). Para abrirlo a todos los clientes, quitar el nodo del filtro en `kapso/build_workflow.py` o editar la lista y volver a publicar la función.
+- **Atiende a todos los clientes** en +591 57358527. El filtro de números de prueba (`kapso/functions/filtro-numeros/index.js`) está desactivado; se vuelve a poner con `USAR_FILTRO=1 python3 kapso/build_workflow.py`.
 - Herramientas: `buscar_productos` (función propia), hora actual, pasar con un humano, esperar al cliente y contexto de WhatsApp.
 - El prompt, los datos, los enlaces y las preguntas frecuentes van en las instrucciones del agente.
 
