@@ -8,6 +8,11 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 MODELO_CLAUDE_SONNET_5_5 = "1caa3ea4-b319-462b-abae-025bcfdd8cf1"
 FUNCION_BUSCAR_PRODUCTOS = "6e5893e1-577b-4bd7-b198-76271747851f"
 FUNCION_FILTRO_NUMEROS = "8305cf42-2f0f-4a87-816e-9599d4303de2"  # kapso/functions/filtro-numeros
+FUNCION_RUTA = "a6626bfa-4bfc-444d-ab76-8c91c5fcd10b"   # kapso/functions/ruta-conversacion
+ESPERA_SEGUIMIENTO_SEG = 2 * 3600    # sin respuesta en 2 h → mensaje de seguimiento
+ESPERA_FINAL_SEG = 20 * 3600         # luego 20 h más (dentro de la ventana de 24 h de WhatsApp) y se cierra
+SEGUIMIENTO = ("¡Hola de nuevo! 👋 ¿Pudiste ver los modelos? Si te gustó alguno, dime la talla y el color "
+               "y un encargado confirma si lo tenemos. Si buscas otra cosa, escríbeme y te ayudo 💪")
 NUMERO_TIENDA = "1362454746955581"        # +591 57358527 (America Sport)
 ENCARGADO = "59175389125"                 # recibe el aviso de cada modelo elegido
 PLANTILLA_AVISO_ENCARGADO = "1140906348851594"  # plantilla Meta "aviso_encargado_pedido"
@@ -30,7 +35,7 @@ HERRAMIENTAS = """
 - `get_current_datetime`: para saber si la tienda está abierta. La tienda está en Bolivia (hora UTC-4).
 - `handoff_to_human`: para pasar con un asesor en reclamos, envíos o cuando lo pidan (incluye un resumen breve en el motivo).
 - `save_variable` + `complete_task`: cuando el cliente elige un modelo (ver esa sección).
-- `enter_waiting`: después de responder o preguntar algo al cliente (sin botones), para esperar su siguiente mensaje.
+- `save_variable` (`siguiente` = `esperar`) + `complete_task`: después de CADA respuesta o pregunta al cliente, incluidas las de botones. No uses `enter_waiting`.
 - Formato WhatsApp: negritas con *un asterisco*, nada de tablas ni encabezados markdown. Envía los enlaces completos tal cual.
 """
 
@@ -65,7 +70,7 @@ herramienta_buscar = {
 
 UI_SKILLS = [
     {"key": "menu_principal", "title": "Menú principal", "component_type": "interactive_list",
-     "enabled": True, "wait_for_reply": True,
+     "enabled": True, "wait_for_reply": False,
      "instruction": ("En el primer mensaje de la conversación, cuando el cliente salude o pida ver opciones. "
                      "body: el saludo de 'Primer mensaje'. button: 'Ver opciones'. Filas (id → title / description): "
                      "calzado → 'Calzado 👟' / 'Zapatillas, chuteras, sandalias y más'; "
@@ -77,7 +82,7 @@ UI_SKILLS = [
                      "Al recibir la elección: calzado/ropa/accesorios → send_ui_elegir_genero; ofertas → buscar_productos con oferta=true; "
                      "ubicacion → send_ui_ubicacion_tienda y luego los horarios; asesor → handoff_to_human.")},
     {"key": "elegir_genero", "title": "Elegir para quién", "component_type": "interactive_reply_buttons",
-     "enabled": True, "wait_for_reply": True,
+     "enabled": True, "wait_for_reply": False,
      "instruction": ("Cuando el cliente elija Calzado, Ropa o Accesorios, o busque un producto sin decir para quién. "
                      "body: '¿Para quién es?' (puedes mencionar lo que busca). Botones (id → title): "
                      "hombre → 'Hombre', mujer → 'Mujer', ninos → 'Niños'. "
@@ -96,7 +101,7 @@ UI_SKILLS = [
                      "longitude -63.1845161, name 'America Sport', address 'Calle Colón #130, Santa Cruz de la Sierra, Bolivia'. "
                      "Después escribe los horarios: lunes a sábado 9:00–20:00, domingo 10:00–14:00.")},
     {"key": "seguir", "title": "Siguiente paso", "component_type": "interactive_reply_buttons",
-     "enabled": True, "wait_for_reply": True,
+     "enabled": True, "wait_for_reply": False,
      "instruction": ("Al terminar de mostrar productos o responder una consulta, para ofrecer el siguiente paso. "
                      "body: pregunta corta, ej. '¿Te gustó alguno? Dime talla y color, o elige:'. Botones (id → title), elige 2 o 3: "
                      "quiero_comprar → 'Quiero comprar', ver_mas → 'Ver más modelos', menu → 'Ver menú', asesor → 'Hablar con asesor'. "
@@ -134,6 +139,31 @@ workflow = {"workflow": {
                  "flow_agent_function_tools": [herramienta_buscar],
                  "ui_skills": UI_SKILLS,
              }}},
+            # Después de cada respuesta del agente: ¿eligió un modelo o hay que esperar?
+            {"id": "ruta_agente", "type": "flow-node", "position": {"x": 950, "y": 250},
+             "data": {"node_type": "decide", "display_name": "¿Eligió modelo?", "config": {
+                 "decision_type": "function", "function_id": FUNCION_RUTA, "llm_configuration": {},
+                 "conditions": [{"label": "pedido", "description": "El cliente eligió un modelo"},
+                                {"label": "esperar", "description": "Esperar la respuesta del cliente"}]}}},
+            {"id": "espera_1", "type": "flow-node", "position": {"x": 950, "y": 450},
+             "data": {"node_type": "wait_for_response", "display_name": "Esperar respuesta (2 h)", "config": {
+                 "has_timeout": True, "timeout_seconds": ESPERA_SEGUIMIENTO_SEG}}},
+            {"id": "ruta_espera_1", "type": "flow-node", "position": {"x": 950, "y": 650},
+             "data": {"node_type": "decide", "display_name": "¿Respondió?", "config": {
+                 "decision_type": "function", "function_id": FUNCION_RUTA, "llm_configuration": {},
+                 "conditions": [{"label": "respondio", "description": "El cliente respondió"},
+                                {"label": "sin_respuesta", "description": "Pasó el tiempo sin respuesta"}]}}},
+            {"id": "seguimiento", "type": "flow-node", "position": {"x": 1250, "y": 650},
+             "data": {"node_type": "send_text", "display_name": "Mensaje de seguimiento", "config": {
+                 "message": SEGUIMIENTO}}},
+            {"id": "espera_2", "type": "flow-node", "position": {"x": 1550, "y": 650},
+             "data": {"node_type": "wait_for_response", "display_name": "Esperar respuesta (20 h)", "config": {
+                 "has_timeout": True, "timeout_seconds": ESPERA_FINAL_SEG}}},
+            {"id": "ruta_espera_2", "type": "flow-node", "position": {"x": 1850, "y": 650},
+             "data": {"node_type": "decide", "display_name": "¿Respondió al seguimiento?", "config": {
+                 "decision_type": "function", "function_id": FUNCION_RUTA, "llm_configuration": {},
+                 "conditions": [{"label": "respondio", "description": "El cliente respondió"},
+                                {"label": "sin_respuesta", "description": "Sin respuesta: se cierra"}]}}},
             # Cliente eligió un modelo → avisar al encargado (si la plantilla está aprobada) → pasar a humano.
             *([{"id": "aviso_encargado", "type": "flow-node", "position": {"x": 950, "y": 50},
                 "data": {"node_type": "send_template", "display_name": "Aviso al encargado", "config": {
@@ -154,9 +184,17 @@ workflow = {"workflow": {
         ],
         "edges": [{"source": "start", "target": "filtro_numeros", "label": "next"},
                   {"source": "filtro_numeros", "target": "sporty", "label": "autorizado"},
-                  *([{"source": "sporty", "target": "aviso_encargado", "label": "next"},
+                  {"source": "sporty", "target": "ruta_agente", "label": "next"},
+                  *([{"source": "ruta_agente", "target": "aviso_encargado", "label": "pedido"},
                      {"source": "aviso_encargado", "target": "confirmar_stock", "label": "next"}] if USAR_AVISO
-                    else [{"source": "sporty", "target": "confirmar_stock", "label": "next"}])],
+                    else [{"source": "ruta_agente", "target": "confirmar_stock", "label": "pedido"}]),
+                  {"source": "ruta_agente", "target": "espera_1", "label": "esperar"},
+                  {"source": "espera_1", "target": "ruta_espera_1", "label": "next"},
+                  {"source": "ruta_espera_1", "target": "sporty", "label": "respondio"},
+                  {"source": "ruta_espera_1", "target": "seguimiento", "label": "sin_respuesta"},
+                  {"source": "seguimiento", "target": "espera_2", "label": "next"},
+                  {"source": "espera_2", "target": "ruta_espera_2", "label": "next"},
+                  {"source": "ruta_espera_2", "target": "sporty", "label": "respondio"}],
     },
 }}
 

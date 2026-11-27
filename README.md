@@ -39,6 +39,7 @@ Contenido del asistente virtual de **America Sport** (tienda de ropa deportiva) 
 El agente **"America Sport - Asistente WhatsApp"** (slug `america-sport-asistente`) está creado en Kapso como **borrador**.
 
 - Workflow: Inicio → **filtro de números** → agente IA "Asistente de America Sport" (Claude Sonnet 5.5) → *(cliente elige un modelo)* → **aviso al encargado** (+591 75389125) → **pasa a humano** para confirmar stock.
+- **Seguimiento:** después de cada respuesta del asistente, el flujo espera. Si el cliente no contesta en **2 h**, se le manda un mensaje de seguimiento (uno solo); si sigue sin contestar 20 h más, la conversación se cierra. Tiempos y texto en `kapso/build_workflow.py` (`ESPERA_SEGUIMIENTO_SEG`, `SEGUIMIENTO`). La función `kapso/functions/ruta-conversacion` decide cada camino.
 - **Aviso al encargado:** plantilla de Meta `aviso_encargado_pedido` (cliente, teléfono, modelo, talla/color, enlace). Se activa con `USAR_AVISO=1 python3 kapso/build_workflow.py` cuando Meta la aprueba y está sincronizada en Kapso (WhatsApp → Templates → Sync from WhatsApp).
 - **Filtro de números** (`kapso/functions/filtro-numeros/index.js`): por ahora el bot solo responde a **+591 77213515** y **+591 72181658**. Otros números no reciben respuesta automática (sus mensajes quedan en la bandeja de Kapso). Para abrirlo a todos los clientes, quitar el nodo del filtro en `kapso/build_workflow.py` o editar la lista y volver a publicar la función.
 - Herramientas: `buscar_productos` (función propia), hora actual, pasar con un humano, esperar al cliente y contexto de WhatsApp.
@@ -60,6 +61,7 @@ Código en `kapso/functions/buscar-productos/index.js` (Kapso Function, Cloudfla
 - `python3 tests/verificar_enlaces.py` → datos clave del prompt y enlaces del catálogo.
 - `node tests/probar_buscar_productos.mjs` → función de búsqueda contra la web real.
 - `node tests/probar_filtro_numeros.mjs` → filtro de números.
+- `node tests/probar_ruta_conversacion.mjs` → ruta de conversación (pedido / esperar / seguimiento).
 
 ### Activarlo
 En Kapso: abrir el workflow → agregar el disparador *Inbound message* con el número de WhatsApp → activar. Probar primero con el número sandbox.
