@@ -36,10 +36,27 @@ Contenido del asistente virtual de **America Sport** (tienda de ropa deportiva) 
 
 ## Agente en Kapso
 
-El agente **"America Sport - Asistente WhatsApp"** (slug `america-sport-asistente`) está creado en Kapso como **borrador**. Su definición está en `kapso/workflow-america-sport.json`, generada a partir de los archivos de `chatbot/`.
+El agente **"America Sport - Asistente WhatsApp"** (slug `america-sport-asistente`) está creado en Kapso como **borrador**.
 
 - Workflow: Inicio → agente IA "Sporty" (Claude Sonnet 5.5).
-- Herramientas del agente: hora actual, pasar con un humano, esperar al cliente y contexto de WhatsApp.
-- Todo el contenido (prompt, datos, enlaces y preguntas frecuentes) va en las instrucciones del agente.
+- Herramientas: `buscar_productos` (función propia), hora actual, pasar con un humano, esperar al cliente y contexto de WhatsApp.
+- El prompt, los datos, los enlaces y las preguntas frecuentes van en las instrucciones del agente.
 
-**Para activarlo:** en Kapso, abre el workflow → agrega el disparador *Inbound message* con el número de WhatsApp → actívalo. Prueba primero con el número sandbox.
+### Función `buscar_productos`
+Código en `kapso/functions/buscar-productos/index.js` (Kapso Function, Cloudflare Worker). Recibe filtros (marca, familia, deporte, género, tipo, oferta y texto del modelo) y:
+1. arma el enlace con la codificación correcta (espacios, Ñ),
+2. revisa que la sección tenga productos (reintenta si la web responde vacía),
+3. devuelve hasta 8 modelos con nombre, enlace y precio normal y de oferta,
+4. si no hay productos, quita los mínimos filtros posibles y avisa (`exacto: false`).
+
+### Actualizar el agente
+1. Editar los archivos de `chatbot/`.
+2. `python3 kapso/build_workflow.py` → regenera `kapso/workflow-america-sport.json`.
+3. Subir la definición a Kapso (PATCH `/platform/v1/workflows/{id}` con `lock_version`).
+
+### Pruebas
+- `python3 tests/verificar_enlaces.py` → datos clave del prompt y enlaces del catálogo.
+- `node tests/probar_buscar_productos.mjs` → función de búsqueda contra la web real.
+
+### Activarlo
+En Kapso: abrir el workflow → agregar el disparador *Inbound message* con el número de WhatsApp → activar. Probar primero con el número sandbox.

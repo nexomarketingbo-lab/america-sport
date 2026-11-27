@@ -1,0 +1,23 @@
+// Prueba local de kapso/functions/buscar-productos/index.js contra la web real.
+// Uso: node tests/probar_buscar_productos.mjs
+// (detrás de un proxy: NODE_USE_ENV_PROXY=1 node tests/probar_buscar_productos.mjs)
+import fs from "node:fs";
+const code = fs.readFileSync(new URL("../kapso/functions/buscar-productos/index.js", import.meta.url), "utf8");
+const handler = new Function(`${code}; return handler;`)();
+const casos = [
+  [{ marca: "nike", familia: "zapatillas", genero: "mujer" }, true],
+  [{ marca: "puma", familia: "chuteras", genero: "niños" }, false], // no existe exacto: debe sugerir chuteras de niño
+  [{ familia: "muñequeras" }, true],
+  [{ marca: "new balance", familia: "zapatillas" }, true],
+  [{ marca: "nike", buscar: "air max" }, true],
+  [{ grupo: "basquet", familia: "pelotas" }, true],
+];
+let fallas = 0;
+for (const [input, exactoEsperado] of casos) {
+  const r = await handler(new Request("http://local", { method: "POST", body: JSON.stringify({ input }) }));
+  const j = await r.json();
+  const ok = j.hay_productos && j.exacto === exactoEsperado && j.productos.every((p) => p.enlace.includes("codigo="));
+  if (!ok) fallas++;
+  console.log(ok ? "OK   " : "FALLA", JSON.stringify(input), "→", j.total_en_pagina, "productos", j.filtros_quitados.length ? `(quitó ${j.filtros_quitados})` : "", "|", j.productos[0]?.nombre ?? "-");
+}
+process.exit(fallas ? 1 : 0);
