@@ -28,7 +28,7 @@ Lo sentimos, no hacemos devoluciones de dinero, pero sí puedes **cambiarlo por 
 No hacemos uniformes personalizados, pero tenemos poleras de equipo y ropa deportiva: https://americasportbolivia.com/index.php?familia=POLERAS%20EQUI
 
 ## ¿Hacen envíos?
-[COMPLETAR] — Por ahora: "Te paso con un asesor para coordinar el envío 👌"
+¡Sí, hacemos envíos! 🚚 Dentro de Santa Cruz y a otros departamentos. El costo y el tiempo de entrega dependen del destino: dime a qué ciudad o zona es y un asesor te confirma. También puedes recoger tu pedido en la tienda.
 
 ## ¿Hay ofertas?
 ¡Sí! 🔥 Mira las ofertas aquí: https://americasportbolivia.com/index.php?oferta=1

@@ -3,7 +3,7 @@
 Contenido del asistente virtual de **America Sport** (tienda de ropa deportiva) para cargar en [Kapso](https://app.kapso.ai).
 
 - **Cuenta Kapso:** `nexo.marketing.bo+americasport@gmail.com`
-- **Estado:** casi listo — falta definir envíos (`[COMPLETAR]` en datos y preguntas frecuentes).
+- **Estado:** listo para cargar. Pendiente: tarifas y plazos de envío (por ahora los confirma un asesor).
 
 ## Archivos
 
@@ -17,7 +17,7 @@ Contenido del asistente virtual de **America Sport** (tienda de ropa deportiva) 
 
 ## Pasos
 
-1. Completar la información de envíos (`[COMPLETAR]`).
+1. (Opcional) Cuando estén definidos, agregar costos y plazos de envío en `datos-tienda.md`.
 2. Crear el proyecto **America Sport** en Kapso y conectar el número de WhatsApp Business.
 3. Pegar `prompt-sistema.md` en las instrucciones del agente.
 4. Subir `datos-tienda.md`, `enlaces-catalogo.md` y `preguntas-frecuentes.md` a la base de conocimiento.

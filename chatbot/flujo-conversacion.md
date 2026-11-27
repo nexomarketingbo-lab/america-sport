@@ -18,7 +18,7 @@ Mensaje del cliente
    ├─ 5 Ubicación ──► Calle Colón #130 + Maps + horarios
    ├─ 6 Asesor ─────► pasar con humano
    ├─ Cambios ──────► todas las tardes, por otro modelo; sin devoluciones
-   ├─ Envíos ───────► pasar con asesor
+   ├─ Envíos ───────► sí hay envíos → pedir ciudad/zona → asesor confirma costo y plazo
    └─ Otra cosa ────► base de conocimiento; si no sabe → asesor
         │
         ▼

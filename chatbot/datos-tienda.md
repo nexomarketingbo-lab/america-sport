@@ -18,7 +18,9 @@
 - **Solo pago por QR.**
 
 ## Envíos
-- [COMPLETAR: ¿hacen envíos? costo y plazo en Santa Cruz y a otros departamentos]. Mientras no esté definido, el bot deriva a un asesor.
+- **Sí hacemos envíos**, dentro de Santa Cruz y a otros departamentos.
+- Costo y plazo: **los confirma un asesor** según el destino. [PENDIENTE: definir tarifas y plazos]
+- También se puede **recoger en tienda**.
 
 ## Cambios y devoluciones
 - **Cambios:** se puede cambiar por otro modelo, **todas las tardes**.
