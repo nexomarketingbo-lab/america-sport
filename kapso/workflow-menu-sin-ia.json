@@ -54,9 +54,9 @@
           },
           "data": {
             "node_type": "send_text",
-            "display_name": "Respuesta al anuncio (tenis)",
+            "display_name": "Respuesta al anuncio (ofertas)",
             "config": {
-              "message": "👟 ¡Hola! Gracias por escribir a *America Sport*. Aquí están los tenis del anuncio y todos nuestros modelos de zapatillas, con precios y tallas:\nhttps://americasportbolivia.com/index.php?familia=ZAPATILLAS\n\n👕 Si buscas poleras: https://americasportbolivia.com/index.php?familia=POLERAS\n\nSi te gusta algún modelo, mándanos la *captura o el enlace* con tu talla y un asesor te confirma 🙌\nEscribe *menú* para ver más opciones."
+              "message": "🔥 ¡Hola! Gracias por escribir a *America Sport*. Estas son nuestras ofertas disponibles, con precios y tallas:\nhttps://americasportbolivia.com/index.php?oferta=1\n\nY por categoría:\n👟 Tenis y zapatillas: https://americasportbolivia.com/index.php?familia=ZAPATILLAS\n👕 Poleras: https://americasportbolivia.com/index.php?familia=POLERAS\n⚽ Balones: https://americasportbolivia.com/index.php?familia=PELOTAS\n\nSi te gusta algún modelo, mándanos la *captura o el enlace* con tu talla y un asesor te confirma 🙌\nEscribe *menú* para ver más opciones."
             }
           }
         },

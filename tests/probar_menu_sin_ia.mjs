@@ -16,7 +16,7 @@ const casos = [
   [{ available_edges: edges, execution_context: { system: { last_resume: { reason: "timeout" } }, vars: { seguimientos: 1 } } }, "cerrar"],
 ];
 const inicio = (c) => ({ available_edges: ["anuncio", "menu"], whatsapp_context: { messages: [{ direction: "inbound", content: c }] } });
-casos.push([inicio("¿Cuáles son los modelos de poleras disponibles?"), "anuncio"], [inicio("Hola"), "menu"], [inicio("precio de las chinelas"), "menu"]);
+casos.push([inicio("¿Cuáles son los modelos de poleras disponibles?"), "anuncio"], [inicio("¿Me pueden mandar más información de las ofertas disponibles?"), "anuncio"], [inicio("Me pueden mandar mas informacion de las ofretas disponibles?"), "menu"], [inicio("Hola"), "menu"], [inicio("precio de las chinelas"), "menu"]);
 let fallas = 0;
 for (const [body, esperado] of casos) {
   const j = await (await handler(new Request("http://l", { method: "POST", body: JSON.stringify(body) }))).json();

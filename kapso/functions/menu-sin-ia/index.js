@@ -6,8 +6,9 @@
 // - Al inicio (edges: anuncio / menu): el mensaje predeterminado del anuncio → "anuncio" (tenis).
 
 const OPCIONES = ["calzado_hombre", "calzado_mujer", "calzado_ninos", "ropa", "accesorios", "ofertas", "ubicacion", "asesor"];
-// Texto predeterminado del anuncio de Meta (el video muestra tenis): se responde con zapatillas.
-const MENSAJE_ANUNCIO = /modelos de poleras disponibles/i;
+// Texto predeterminado del anuncio de Meta (el video muestra poleras, balones y tenis): se responde con ofertas y esas categorías.
+// Incluye el texto viejo ("modelos de poleras disponibles") y el nuevo ("más información de las ofertas disponibles").
+const MENSAJE_ANUNCIO = /modelos de poleras disponibles|informaci[oó]n de las ofertas|ofertas disponibles/i;
 const VOLVER_AL_MENU = /^(men[uú]|hola|holi|buenas|buen[oa]s (d[ií]as|tardes|noches)|inicio|opciones|volver)(?=$|[\s!.,?¡¿])/iu;
 
 function limpiar(texto) {

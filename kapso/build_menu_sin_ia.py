@@ -37,9 +37,11 @@ UBICACION = ("📍 *America Sport*\nCalle Colón #130, Santa Cruz de la Sierra\n
 ASESOR = f"¡Gracias por escribirnos! 🙌 Enseguida un asesor de America Sport se comunicará contigo.\n{HORARIO}"
 SEGUIMIENTO = ("¡Hola de nuevo! 👋 ¿Encontraste lo que buscabas? Si te gustó algún modelo, mándanos la captura o el enlace "
                "con tu talla y un asesor te confirma. Escribe *menú* para ver las opciones.")
-ANUNCIO = ("👟 ¡Hola! Gracias por escribir a *America Sport*. Aquí están los tenis del anuncio y todos nuestros modelos "
-           f"de zapatillas, con precios y tallas:\n{B}?familia=ZAPATILLAS\n\n"
-           f"👕 Si buscas poleras: {B}?familia=POLERAS\n\n"
+ANUNCIO = ("🔥 ¡Hola! Gracias por escribir a *America Sport*. Estas son nuestras ofertas disponibles, con precios y tallas:\n"
+           f"{B}?oferta=1\n\nY por categoría:\n"
+           f"👟 Tenis y zapatillas: {B}?familia=ZAPATILLAS\n"
+           f"👕 Poleras: {B}?familia=POLERAS\n"
+           f"⚽ Balones: {B}?familia=PELOTAS\n\n"
            "Si te gusta algún modelo, mándanos la *captura o el enlace* con tu talla y un asesor te confirma 🙌\n"
            "Escribe *menú* para ver más opciones.")
 MENU = ("¡Hola! 👋 Bienvenido a *America Sport*. ¿Qué estás buscando hoy?\n\n"
@@ -65,7 +67,7 @@ nodes = [
         "decision_type": "function", "function_id": FUNCION_MENU, "llm_configuration": {},
         "conditions": [{"label": "anuncio", "description": "Mensaje predeterminado del anuncio"},
                        {"label": "menu", "description": "Cualquier otro primer mensaje"}]}),
-    texto("t_anuncio", 250, 560, "Respuesta al anuncio (tenis)", ANUNCIO),
+    texto("t_anuncio", 250, 560, "Respuesta al anuncio (ofertas)", ANUNCIO),
     nodo("menu", "send_interactive", 250, 300, "Menú", {
         "interactive_type": "list", "body_text": MENU, "list_button_text": "Ver opciones",
         "list_sections": [{"title": "America Sport", "rows": filas}]}),
