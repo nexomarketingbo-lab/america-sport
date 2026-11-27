@@ -18,7 +18,7 @@ SEGUIMIENTO = ("¡Hola de nuevo! 👋 ¿Pudiste ver los modelos? Si te gustó al
 NUMERO_TIENDA = "1362454746955581"        # +591 57358527 (America Sport)
 ENCARGADO = "59175389125"                 # recibe el aviso de cada modelo elegido
 # Plantilla "aviso_modelo_no_encontrado" (Meta 29440643932243165): poner aquí su id interno de Kapso cuando esté aprobada.
-PLANTILLA_AVISO_CONSULTA = None
+PLANTILLA_AVISO_CONSULTA = None  # mientras no esté aprobada se usa PLANTILLA_AVISO_ENCARGADO
 PLANTILLA_AVISO_ENCARGADO = "8223f293-6de1-4305-bb7a-e1caf35d5f0e"  # id Kapso de la plantilla "aviso_encargado_pedido" (Meta 1140906348851594)
 # La plantilla debe estar aprobada por Meta y sincronizada en Kapso antes de activar el aviso.
 USAR_AVISO = __import__("os").environ.get("USAR_AVISO", "1") == "1"
@@ -40,21 +40,14 @@ HERRAMIENTAS = """
 - `buscar_productos`: úsala SIEMPRE antes de mandar un enlace de productos (ver regla principal), y con `codigo` cuando el cliente elige un modelo.
 - `ask_about_file`: para ver fotos, capturas o archivos que mande el cliente (usa la URL que viene en su mensaje).
 - `get_current_datetime`: para saber si la tienda está abierta. La tienda está en Bolivia (hora UTC-4).
-- `handoff_to_human`: para pasar con un asesor en reclamos, envíos o cuando lo pidan (incluye un resumen breve en el motivo).
+- Para pasar con un asesor usa SIEMPRE la "Regla fija" (`siguiente` = `asesor`), así se avisa al personal.
 - `save_variable` + `complete_task`: cuando el cliente elige un modelo, o pide uno que no existe (ver esas secciones).
 - `save_variable` (`siguiente` = `esperar`) + `complete_task`: después de CADA respuesta o pregunta al cliente, incluidas las de botones. No uses `enter_waiting`.
 - Formato WhatsApp: negritas con *un asterisco*, nada de tablas ni encabezados markdown. Envía los enlaces completos tal cual.
 """
 
 prompt = limpiar(leer("prompt-sistema.md"))
-if not PLANTILLA_AVISO_CONSULTA:
-    # Sin plantilla aprobada no hay aviso: no prometer que se avisó al personal.
-    prompt = prompt.replace(
-        '2. Avísale que vas a consultar con el personal: "Igual le pasé tu consulta al personal de la tienda por si lo tienen; si lo encuentran, te escriben por aquí 🙌".',
-        '2. Ofrécele hablar con un asesor por si lo tienen en tienda (botón "Hablar con asesor").')
-    prompt = prompt.replace('4. Guarda `siguiente` = `consulta` y llama a `complete_task` (en vez de `esperar`). Así se avisa al personal y la conversación sigue contigo.',
-                            '4. Guarda `siguiente` = `esperar` y llama a `complete_task`.').replace(
-    "la sección ENLACES DEL CATÁLOGO", "la sección ENLACES DEL CATÁLOGO")
+# El aviso al personal siempre está activo (plantilla de consulta o, si no, la de pedido).
 system = (prompt + "\n" + HERRAMIENTAS
           + "\n\n=== DATOS DE LA TIENDA ===\n" + limpiar(leer("datos-tienda.md"))
           + "\n\n=== ENLACES DEL CATÁLOGO ===\n" + limpiar(leer("enlaces-catalogo.md"))
@@ -97,7 +90,7 @@ UI_SKILLS = [
                      "ubicacion → 'Ubicación y horarios 📍' / 'Calle Colón #130, Santa Cruz'; "
                      "asesor → 'Hablar con un asesor' / 'Te atiende una persona de la tienda'. "
                      "Al recibir la elección: calzado/ropa/accesorios → send_ui_elegir_genero; ofertas → buscar_productos con oferta=true; "
-                     "ubicacion → send_ui_ubicacion_tienda y luego los horarios; asesor → handoff_to_human.")},
+                     "ubicacion → send_ui_ubicacion_tienda y luego los horarios; asesor → sigue la \"Regla fija\" (siguiente = asesor).")},
     {"key": "elegir_genero", "title": "Elegir para quién", "component_type": "interactive_reply_buttons",
      "enabled": True, "wait_for_reply": False,
      "instruction": ("Cuando el cliente elija Calzado, Ropa o Accesorios, o busque un producto sin decir para quién. "
@@ -138,7 +131,7 @@ UI_SKILLS = [
                      "ver_mas → responde SIEMPRE con texto invitando a ver todos los modelos en la página, con el enlace_seccion de la última búsqueda "
                      "(o https://americasportbolivia.com si no hay), ej. 'Tenemos muchos más modelos 👟 Míralos todos aquí: <enlace>. Si te gusta alguno, "
                      "mándame el enlace o una captura y te ayudo con la talla 🙌'; "
-                     "menu → send_ui_menu_principal; asesor → handoff_to_human.")},
+                     "menu → send_ui_menu_principal; asesor → sigue la \"Regla fija\" (siguiente = asesor).")},
     {"key": "elegir_modelo", "title": "Elegir modelo", "component_type": "interactive_list",
      "enabled": True, "wait_for_reply": False,
      "instruction": ("Cuando el cliente quiere comprar pero no dijo cuál modelo (ej. toca 'Quiero comprar' o escribe 'lo quiero' sin "
@@ -173,7 +166,7 @@ workflow = {"workflow": {
                  "provider_model_id": MODELO,
                  "temperature": 0.3,
                  "message_delivery_mode": "auto_send_assistant_text",
-                 "enabled_default_tools": ["get_current_datetime", "handoff_to_human", "enter_waiting",
+                 "enabled_default_tools": ["get_current_datetime", "enter_waiting",
                                            "get_whatsapp_context", "complete_task", "save_variable", "ask_about_file"],
                  "flow_agent_function_tools": [herramienta_buscar],
                  "ui_skills": UI_SKILLS,
@@ -184,8 +177,8 @@ workflow = {"workflow": {
                  "decision_type": "function", "function_id": FUNCION_RUTA, "llm_configuration": {},
                  "conditions": [{"label": "pedido", "description": "El cliente eligió un modelo"},
                                 {"label": "esperar", "description": "Esperar la respuesta del cliente"},
-                                *([{"label": "consulta", "description": "Pidió un modelo que no existe: avisar al personal"}]
-                                  if PLANTILLA_AVISO_CONSULTA else [])]}}},
+                                {"label": "consulta", "description": "Pidió un modelo que no existe: avisar al personal"},
+                                {"label": "asesor", "description": "No sabe responder: avisar al personal y pasar a un asesor"}]}}},
             {"id": "espera_1", "type": "flow-node", "position": {"x": 950, "y": 450},
              "data": {"node_type": "wait_for_response", "display_name": "Esperar respuesta (2 h)", "config": {
                  "has_timeout": True, "timeout_seconds": ESPERA_SEGUIMIENTO_SEG}}},
@@ -220,17 +213,27 @@ workflow = {"workflow": {
                     ]}],
                 }}}] if USAR_AVISO else []),
             # Cliente pidió un modelo que no existe → avisar al personal y seguir la conversación.
-            *([{"id": "aviso_consulta", "type": "flow-node", "position": {"x": 1250, "y": 300},
-                "data": {"node_type": "send_template", "display_name": "Aviso: modelo no encontrado", "config": {
-                    "template_id": PLANTILLA_AVISO_CONSULTA,
-                    "phone_number_id": NUMERO_TIENDA,
-                    "to_phone_number": ENCARGADO,
-                    "parameters": [{"type": "BODY", "parameters": [
-                        {"type": "text", "parameter_name": "cliente", "text": "{{vars.cliente_nombre}}"},
+            # Cliente preguntó algo que el bot no sabe → avisar al personal y pasar a un asesor.
+            *[{"id": nid, "type": "flow-node", "position": {"x": 1250, "y": y},
+               "data": {"node_type": "send_template", "display_name": nombre, "config": {
+                   "template_id": PLANTILLA_AVISO_CONSULTA or PLANTILLA_AVISO_ENCARGADO,
+                   "phone_number_id": NUMERO_TIENDA,
+                   "to_phone_number": ENCARGADO,
+                   "parameters": [{"type": "BODY", "parameters": (
+                       [{"type": "text", "parameter_name": "cliente", "text": "{{vars.cliente_nombre}}"},
                         {"type": "text", "parameter_name": "telefono", "text": "+{{context.phone_number}}"},
-                        {"type": "text", "parameter_name": "busqueda", "text": "{{vars.consulta_busqueda}}"},
-                    ]}],
-                }}}] if PLANTILLA_AVISO_CONSULTA else []),
+                        {"type": "text", "parameter_name": "busqueda", "text": "{{vars.consulta_busqueda}}"}]
+                       if PLANTILLA_AVISO_CONSULTA and nid == "aviso_consulta" else
+                       [{"type": "text", "parameter_name": "cliente", "text": "{{vars.cliente_nombre}}"},
+                        {"type": "text", "parameter_name": "telefono", "text": "+{{context.phone_number}}"},
+                        {"type": "text", "parameter_name": "modelo", "text": "Consulta: {{vars.consulta_busqueda}}"},
+                        {"type": "text", "parameter_name": "detalle", "text": "Ver el chat"},
+                        {"type": "text", "parameter_name": "enlace", "text": "https://americasportbolivia.com"}])}],
+               }}} for nid, nombre, y in [("aviso_consulta", "Aviso: modelo no encontrado", 300),
+                                           ("aviso_asesor", "Aviso: consulta para un asesor", 420)]],
+            {"id": "pasar_a_asesor", "type": "flow-node", "position": {"x": 1550, "y": 420},
+             "data": {"node_type": "handoff", "display_name": "Pasa a un asesor", "config": {
+                 "reason": "Consulta que el bot no sabe responder"}}},
             {"id": "confirmar_stock", "type": "flow-node", "position": {"x": 1250, "y": 50},
              "data": {"node_type": "handoff", "display_name": "Encargado confirma stock", "config": {
                  "reason": "Cliente eligió un modelo: confirmar disponibilidad"}}},
@@ -243,8 +246,10 @@ workflow = {"workflow": {
                      {"source": "aviso_encargado", "target": "confirmar_stock", "label": "next"}] if USAR_AVISO
                     else [{"source": "ruta_agente", "target": "confirmar_stock", "label": "pedido"}]),
                   {"source": "ruta_agente", "target": "espera_1", "label": "esperar"},
-                  *([{"source": "ruta_agente", "target": "aviso_consulta", "label": "consulta"},
-                     {"source": "aviso_consulta", "target": "espera_1", "label": "next"}] if PLANTILLA_AVISO_CONSULTA else []),
+                  {"source": "ruta_agente", "target": "aviso_consulta", "label": "consulta"},
+                  {"source": "aviso_consulta", "target": "espera_1", "label": "next"},
+                  {"source": "ruta_agente", "target": "aviso_asesor", "label": "asesor"},
+                  {"source": "aviso_asesor", "target": "pasar_a_asesor", "label": "next"},
                   {"source": "espera_1", "target": "ruta_espera_1", "label": "next"},
                   {"source": "ruta_espera_1", "target": "sporty", "label": "respondio"},
                   {"source": "ruta_espera_1", "target": "seguimiento", "label": "sin_respuesta"},

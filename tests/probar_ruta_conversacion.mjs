@@ -8,6 +8,7 @@ const casos = [
   [{ available_edges: ["pedido", "esperar"], execution_context: { vars: {} } }, "esperar"],
   [{ available_edges: ["pedido", "esperar", "consulta"], execution_context: { vars: { siguiente: "consulta" } } }, "consulta"],
   [{ available_edges: ["pedido", "esperar"], execution_context: { vars: { siguiente: "consulta" } } }, "esperar"],
+  [{ available_edges: ["pedido", "esperar", "consulta", "asesor"], execution_context: { vars: { siguiente: "asesor" } } }, "asesor"],
   [{ available_edges: ["respondio", "sin_respuesta"], execution_context: { system: { last_resume: { reason: "timeout" } } } }, "sin_respuesta"],
   [{ available_edges: ["respondio", "sin_respuesta"], execution_context: { system: { last_resume: { reason: "user_input" } } } }, "respondio"],
 ];

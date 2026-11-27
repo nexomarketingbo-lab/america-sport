@@ -34,6 +34,11 @@ Contenido del asistente virtual de **America Sport** (tienda de ropa deportiva) 
 - [ ] Deriva a un asesor humano cuando se le pide
 - [ ] Responde bien fuera de horario
 
+## Regla fija del proyecto
+**Todo lo que el bot no sepa responder se avisa al personal** (encargado +591 75389125) y la conversación pasa a una persona. Aplica a los dos bots:
+- Menú sin IA: cualquier mensaje que no sea una opción del menú → aviso + asesor.
+- Agente con IA: `siguiente = asesor` (dudas, envíos, reclamos, pagos, "hablar con una persona") → aviso + asesor; `siguiente = consulta` (modelo que no existe) → aviso y sigue la conversación. Sin `handoff_to_human`: toda derivación pasa por el aviso.
+
 ## Bot activo ahora: menú sin IA
 
 Para no gastar créditos de IA, el número +591 57358527 está atendido por **"America Sport - Menú sin IA"** (`kapso/build_menu_sin_ia.py` → `kapso/workflow-menu-sin-ia.json`, función `kapso/functions/menu-sin-ia`):

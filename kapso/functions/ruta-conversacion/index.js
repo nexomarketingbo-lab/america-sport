@@ -1,5 +1,5 @@
 // Router del flujo America Sport (nodos "decide" en modo función).
-// - Después del agente (edges: pedido / esperar / consulta): usa la variable `siguiente` que guarda el agente.
+// - Después del agente (edges: pedido / esperar / consulta / asesor): usa la variable `siguiente` que guarda el agente.
 // - Después de una espera (edges: respondio / sin_respuesta): usa system.last_resume.reason.
 
 function motivoReanudacion(body) {
@@ -22,7 +22,10 @@ async function handler(request, env) {
   if (edges.includes("pedido")) {
     const sig = String(vars.siguiente || "").toLowerCase();
     // "consulta" = el cliente pidió un modelo que no existe → avisar al personal (si el flujo tiene ese camino).
-    next_edge = sig === "pedido" ? "pedido" : sig === "consulta" && edges.includes("consulta") ? "consulta" : "esperar";
+    next_edge = sig === "pedido" ? "pedido"
+      : sig === "asesor" && edges.includes("asesor") ? "asesor"
+      : sig === "consulta" && edges.includes("consulta") ? "consulta"
+      : "esperar";
     return new Response(JSON.stringify({ next_edge, vars: { siguiente: "" } }), {
       headers: { "Content-Type": "application/json" },
     });
