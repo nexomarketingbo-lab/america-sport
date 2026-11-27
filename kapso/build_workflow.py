@@ -9,7 +9,7 @@ MODELO_CLAUDE_SONNET_5_5 = "1caa3ea4-b319-462b-abae-025bcfdd8cf1"
 FUNCION_BUSCAR_PRODUCTOS = "6e5893e1-577b-4bd7-b198-76271747851f"
 FUNCION_FILTRO_NUMEROS = "8305cf42-2f0f-4a87-816e-9599d4303de2"  # kapso/functions/filtro-numeros
 FUNCION_RUTA = "a6626bfa-4bfc-444d-ab76-8c91c5fcd10b"   # kapso/functions/ruta-conversacion
-ESPERA_SEGUIMIENTO_SEG = 2 * 3600    # sin respuesta en 2 h → mensaje de seguimiento
+ESPERA_SEGUIMIENTO_SEG = int(__import__("os").environ.get("ESPERA_SEGUIMIENTO_SEG", 2 * 3600))  # sin respuesta en 2 h → seguimiento
 ESPERA_FINAL_SEG = 20 * 3600         # luego 20 h más (dentro de la ventana de 24 h de WhatsApp) y se cierra
 SEGUIMIENTO = ("¡Hola de nuevo! 👋 ¿Pudiste ver los modelos? Si te gustó alguno, dime la talla y el color "
                "y un encargado confirma si lo tenemos. Si buscas otra cosa, escríbeme y te ayudo 💪")
