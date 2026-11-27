@@ -15,7 +15,7 @@ SEGUIMIENTO = ("¡Hola de nuevo! 👋 ¿Pudiste ver los modelos? Si te gustó al
                "y un encargado confirma si lo tenemos. Si buscas otra cosa, escríbeme y te ayudo 💪")
 NUMERO_TIENDA = "1362454746955581"        # +591 57358527 (America Sport)
 ENCARGADO = "59175389125"                 # recibe el aviso de cada modelo elegido
-PLANTILLA_AVISO_ENCARGADO = "1140906348851594"  # plantilla Meta "aviso_encargado_pedido"
+PLANTILLA_AVISO_ENCARGADO = "8223f293-6de1-4305-bb7a-e1caf35d5f0e"  # id Kapso de la plantilla "aviso_encargado_pedido" (Meta 1140906348851594)
 # La plantilla debe estar aprobada por Meta y sincronizada en Kapso antes de activar el aviso.
 USAR_AVISO = __import__("os").environ.get("USAR_AVISO", "1") == "1"
 
