@@ -1,0 +1,483 @@
+{
+  "workflow": {
+    "name": "America Sport - Menú sin IA",
+    "slug": "america-sport-menu-sin-ia",
+    "description": "Bot sin IA: menú con enlaces a la web; consultas libres pasan a un asesor con aviso al encargado.",
+    "definition": {
+      "nodes": [
+        {
+          "id": "start",
+          "type": "flow-node",
+          "position": {
+            "x": 0,
+            "y": 300
+          },
+          "data": {
+            "node_type": "start",
+            "display_name": "Inicio",
+            "config": {}
+          }
+        },
+        {
+          "id": "menu",
+          "type": "flow-node",
+          "position": {
+            "x": 250,
+            "y": 300
+          },
+          "data": {
+            "node_type": "send_interactive",
+            "display_name": "Menú",
+            "config": {
+              "interactive_type": "list",
+              "body_text": "¡Hola! 👋 Bienvenido a *America Sport*. ¿Qué estás buscando hoy?\n\n🛒 Catálogo completo: https://americasportbolivia.com\n\nElige una opción o escríbenos tu consulta y un asesor te atiende.",
+              "list_button_text": "Ver opciones",
+              "list_sections": [
+                {
+                  "title": "America Sport",
+                  "rows": [
+                    {
+                      "id": "calzado_hombre",
+                      "title": "Calzado hombre 👟",
+                      "description": "Zapatillas, chuteras y más"
+                    },
+                    {
+                      "id": "calzado_mujer",
+                      "title": "Calzado mujer 👟",
+                      "description": "Zapatillas, sandalias y más"
+                    },
+                    {
+                      "id": "calzado_ninos",
+                      "title": "Calzado niños 👟",
+                      "description": "Zapatillas, chuteras y más"
+                    },
+                    {
+                      "id": "ropa",
+                      "title": "Ropa 👕",
+                      "description": "Poleras, shorts, buzos, calzas"
+                    },
+                    {
+                      "id": "accesorios",
+                      "title": "Accesorios ⚽",
+                      "description": "Pelotas, mochilas, gorras, guantes"
+                    },
+                    {
+                      "id": "ofertas",
+                      "title": "Ofertas 🔥",
+                      "description": "Productos con descuento"
+                    },
+                    {
+                      "id": "ubicacion",
+                      "title": "Ubicación y horarios 📍",
+                      "description": "Calle Colón #130, Santa Cruz"
+                    },
+                    {
+                      "id": "asesor",
+                      "title": "Hablar con un asesor",
+                      "description": "Te atiende una persona de la tienda"
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "espera",
+          "type": "flow-node",
+          "position": {
+            "x": 500,
+            "y": 300
+          },
+          "data": {
+            "node_type": "wait_for_response",
+            "display_name": "Esperar respuesta (2 h)",
+            "config": {
+              "has_timeout": true,
+              "timeout_seconds": 7200
+            }
+          }
+        },
+        {
+          "id": "ruta",
+          "type": "flow-node",
+          "position": {
+            "x": 750,
+            "y": 300
+          },
+          "data": {
+            "node_type": "decide",
+            "display_name": "¿Qué eligió?",
+            "config": {
+              "decision_type": "function",
+              "function_id": "d2535f06-f55f-40d3-8f70-4c737b13e65a",
+              "llm_configuration": {},
+              "conditions": [
+                {
+                  "label": "calzado_hombre",
+                  "description": "calzado hombre"
+                },
+                {
+                  "label": "calzado_mujer",
+                  "description": "calzado mujer"
+                },
+                {
+                  "label": "calzado_ninos",
+                  "description": "calzado ninos"
+                },
+                {
+                  "label": "ropa",
+                  "description": "ropa"
+                },
+                {
+                  "label": "accesorios",
+                  "description": "accesorios"
+                },
+                {
+                  "label": "ofertas",
+                  "description": "ofertas"
+                },
+                {
+                  "label": "ubicacion",
+                  "description": "ubicacion"
+                },
+                {
+                  "label": "asesor",
+                  "description": "asesor"
+                },
+                {
+                  "label": "menu",
+                  "description": "menu"
+                },
+                {
+                  "label": "sin_respuesta",
+                  "description": "sin respuesta"
+                },
+                {
+                  "label": "cerrar",
+                  "description": "cerrar"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "t_calzado_hombre",
+          "type": "flow-node",
+          "position": {
+            "x": 1050,
+            "y": 40
+          },
+          "data": {
+            "node_type": "send_text",
+            "display_name": "Calzado hombre 👟",
+            "config": {
+              "message": "👟 *Calzado para hombre*\nMira todos los modelos con precios y tallas aquí:\nhttps://americasportbolivia.com/index.php?tipo=CALZADO&genero=HOMBRE\n\nSi te gusta algún modelo, mándanos la *captura o el enlace* con tu talla y un asesor te confirma si está disponible 🙌\nEscribe *menú* para ver otras opciones."
+            }
+          }
+        },
+        {
+          "id": "t_calzado_mujer",
+          "type": "flow-node",
+          "position": {
+            "x": 1050,
+            "y": 130
+          },
+          "data": {
+            "node_type": "send_text",
+            "display_name": "Calzado mujer 👟",
+            "config": {
+              "message": "👟 *Calzado para mujer*\nMira todos los modelos con precios y tallas aquí:\nhttps://americasportbolivia.com/index.php?tipo=CALZADO&genero=MUJER\n\nSi te gusta algún modelo, mándanos la *captura o el enlace* con tu talla y un asesor te confirma si está disponible 🙌\nEscribe *menú* para ver otras opciones."
+            }
+          }
+        },
+        {
+          "id": "t_calzado_ninos",
+          "type": "flow-node",
+          "position": {
+            "x": 1050,
+            "y": 220
+          },
+          "data": {
+            "node_type": "send_text",
+            "display_name": "Calzado niños 👟",
+            "config": {
+              "message": "👟 *Calzado para niños*\nMira todos los modelos con precios y tallas aquí:\nhttps://americasportbolivia.com/index.php?tipo=CALZADO&genero=NI%C2%A5OS\n\nSi te gusta algún modelo, mándanos la *captura o el enlace* con tu talla y un asesor te confirma si está disponible 🙌\nEscribe *menú* para ver otras opciones."
+            }
+          }
+        },
+        {
+          "id": "t_ropa",
+          "type": "flow-node",
+          "position": {
+            "x": 1050,
+            "y": 310
+          },
+          "data": {
+            "node_type": "send_text",
+            "display_name": "Ropa 👕",
+            "config": {
+              "message": "👕 *Ropa deportiva*\nMira todos los modelos con precios y tallas aquí:\nhttps://americasportbolivia.com/index.php?tipo=ROPA\n\nSi te gusta algún modelo, mándanos la *captura o el enlace* con tu talla y un asesor te confirma si está disponible 🙌\nEscribe *menú* para ver otras opciones."
+            }
+          }
+        },
+        {
+          "id": "t_accesorios",
+          "type": "flow-node",
+          "position": {
+            "x": 1050,
+            "y": 400
+          },
+          "data": {
+            "node_type": "send_text",
+            "display_name": "Accesorios ⚽",
+            "config": {
+              "message": "⚽ *Accesorios*\nMira todo aquí:\nhttps://americasportbolivia.com/index.php?tipo=ACCESORIOS\n\nSi te gusta algún modelo, mándanos la *captura o el enlace* con tu talla y un asesor te confirma si está disponible 🙌\nEscribe *menú* para ver otras opciones."
+            }
+          }
+        },
+        {
+          "id": "t_ofertas",
+          "type": "flow-node",
+          "position": {
+            "x": 1050,
+            "y": 490
+          },
+          "data": {
+            "node_type": "send_text",
+            "display_name": "Ofertas 🔥",
+            "config": {
+              "message": "🔥 *Ofertas*\nMira todos los productos con descuento aquí:\nhttps://americasportbolivia.com/index.php?oferta=1\n\nSi te gusta algún modelo, mándanos la *captura o el enlace* con tu talla y un asesor te confirma si está disponible 🙌\nEscribe *menú* para ver otras opciones."
+            }
+          }
+        },
+        {
+          "id": "t_ubicacion",
+          "type": "flow-node",
+          "position": {
+            "x": 1050,
+            "y": 600
+          },
+          "data": {
+            "node_type": "send_text",
+            "display_name": "Ubicación",
+            "config": {
+              "message": "📍 *America Sport*\nCalle Colón #130, Santa Cruz de la Sierra\nhttps://maps.app.goo.gl/MiKgaevYmwHoAXeU9\n\n🕘 Atendemos de lunes a sábado de 9:00 a 20:00 y domingos de 10:00 a 14:00.\n\nEscribe *menú* para ver otras opciones."
+            }
+          }
+        },
+        {
+          "id": "t_seguimiento",
+          "type": "flow-node",
+          "position": {
+            "x": 1050,
+            "y": 700
+          },
+          "data": {
+            "node_type": "send_text",
+            "display_name": "Seguimiento",
+            "config": {
+              "message": "¡Hola de nuevo! 👋 ¿Encontraste lo que buscabas? Si te gustó algún modelo, mándanos la captura o el enlace con tu talla y un asesor te confirma. Escribe *menú* para ver las opciones."
+            }
+          }
+        },
+        {
+          "id": "t_asesor",
+          "type": "flow-node",
+          "position": {
+            "x": 1050,
+            "y": 820
+          },
+          "data": {
+            "node_type": "send_text",
+            "display_name": "Un asesor te contacta",
+            "config": {
+              "message": "¡Gracias por escribirnos! 🙌 Enseguida un asesor de America Sport se comunicará contigo.\nAtendemos de lunes a sábado de 9:00 a 20:00 y domingos de 10:00 a 14:00."
+            }
+          }
+        },
+        {
+          "id": "aviso_encargado",
+          "type": "flow-node",
+          "position": {
+            "x": 1350,
+            "y": 820
+          },
+          "data": {
+            "node_type": "send_template",
+            "display_name": "Aviso al encargado",
+            "config": {
+              "template_id": "8223f293-6de1-4305-bb7a-e1caf35d5f0e",
+              "phone_number_id": "1362454746955581",
+              "to_phone_number": "59175389125",
+              "parameters": [
+                {
+                  "type": "BODY",
+                  "parameters": [
+                    {
+                      "type": "text",
+                      "parameter_name": "cliente",
+                      "text": "Cliente"
+                    },
+                    {
+                      "type": "text",
+                      "parameter_name": "telefono",
+                      "text": "+{{context.phone_number}}"
+                    },
+                    {
+                      "type": "text",
+                      "parameter_name": "modelo",
+                      "text": "Consulta: {{vars.aviso_mensaje}}"
+                    },
+                    {
+                      "type": "text",
+                      "parameter_name": "detalle",
+                      "text": "Ver el chat"
+                    },
+                    {
+                      "type": "text",
+                      "parameter_name": "enlace",
+                      "text": "https://americasportbolivia.com"
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "pasar_a_humano",
+          "type": "flow-node",
+          "position": {
+            "x": 1650,
+            "y": 820
+          },
+          "data": {
+            "node_type": "handoff",
+            "display_name": "Pasa a un asesor",
+            "config": {
+              "reason": "Consulta para un asesor"
+            }
+          }
+        }
+      ],
+      "edges": [
+        {
+          "source": "start",
+          "target": "menu",
+          "label": "next"
+        },
+        {
+          "source": "menu",
+          "target": "espera",
+          "label": "next"
+        },
+        {
+          "source": "espera",
+          "target": "ruta",
+          "label": "next"
+        },
+        {
+          "source": "ruta",
+          "target": "t_calzado_hombre",
+          "label": "calzado_hombre"
+        },
+        {
+          "source": "ruta",
+          "target": "t_calzado_mujer",
+          "label": "calzado_mujer"
+        },
+        {
+          "source": "ruta",
+          "target": "t_calzado_ninos",
+          "label": "calzado_ninos"
+        },
+        {
+          "source": "ruta",
+          "target": "t_ropa",
+          "label": "ropa"
+        },
+        {
+          "source": "ruta",
+          "target": "t_accesorios",
+          "label": "accesorios"
+        },
+        {
+          "source": "ruta",
+          "target": "t_ofertas",
+          "label": "ofertas"
+        },
+        {
+          "source": "t_calzado_hombre",
+          "target": "espera",
+          "label": "next"
+        },
+        {
+          "source": "t_calzado_mujer",
+          "target": "espera",
+          "label": "next"
+        },
+        {
+          "source": "t_calzado_ninos",
+          "target": "espera",
+          "label": "next"
+        },
+        {
+          "source": "t_ropa",
+          "target": "espera",
+          "label": "next"
+        },
+        {
+          "source": "t_accesorios",
+          "target": "espera",
+          "label": "next"
+        },
+        {
+          "source": "t_ofertas",
+          "target": "espera",
+          "label": "next"
+        },
+        {
+          "source": "ruta",
+          "target": "t_ubicacion",
+          "label": "ubicacion"
+        },
+        {
+          "source": "t_ubicacion",
+          "target": "espera",
+          "label": "next"
+        },
+        {
+          "source": "ruta",
+          "target": "menu",
+          "label": "menu"
+        },
+        {
+          "source": "ruta",
+          "target": "t_seguimiento",
+          "label": "sin_respuesta"
+        },
+        {
+          "source": "t_seguimiento",
+          "target": "espera",
+          "label": "next"
+        },
+        {
+          "source": "ruta",
+          "target": "t_asesor",
+          "label": "asesor"
+        },
+        {
+          "source": "t_asesor",
+          "target": "aviso_encargado",
+          "label": "next"
+        },
+        {
+          "source": "aviso_encargado",
+          "target": "pasar_a_humano",
+          "label": "next"
+        }
+      ]
+    }
+  }
+}

@@ -34,6 +34,16 @@ Contenido del asistente virtual de **America Sport** (tienda de ropa deportiva) 
 - [ ] Deriva a un asesor humano cuando se le pide
 - [ ] Responde bien fuera de horario
 
+## Bot activo ahora: menú sin IA
+
+Para no gastar créditos de IA, el número +591 57358527 está atendido por **"America Sport - Menú sin IA"** (`kapso/build_menu_sin_ia.py` → `kapso/workflow-menu-sin-ia.json`, función `kapso/functions/menu-sin-ia`):
+- Menú en lista (calzado hombre / mujer / niños, ropa, accesorios, ofertas, ubicación, asesor) → enlace a esa sección de la web.
+- Cualquier mensaje que no sea una opción (texto, foto, enlace) → "Enseguida un asesor se comunicará contigo" + aviso al encargado (+591 75389125) + pasa a humano.
+- "menú" / "hola" → vuelve a mostrar el menú. Sin respuesta en 2 h → un seguimiento; luego se cierra.
+- Prueba: `node tests/probar_menu_sin_ia.mjs`.
+
+El agente con IA (abajo) sigue guardado en Kapso con su disparador **apagado**. Para volver a usarlo: activar su disparador y apagar el del menú sin IA (solo uno puede estar activo por número).
+
 ## Agente en Kapso
 
 El agente **"America Sport - Asistente WhatsApp"** (slug `america-sport-asistente`) está **activo** en Kapso, en el número **+591 57358527**.
