@@ -31,7 +31,8 @@ def limpiar(t):
 
 HERRAMIENTAS = """
 ## Herramientas
-- `buscar_productos`: úsala SIEMPRE antes de mandar un enlace de productos (ver regla principal).
+- `buscar_productos`: úsala SIEMPRE antes de mandar un enlace de productos (ver regla principal), y con `codigo` cuando el cliente elige un modelo.
+- `ask_about_file`: para ver fotos, capturas o archivos que mande el cliente (usa la URL que viene en su mensaje).
 - `get_current_datetime`: para saber si la tienda está abierta. La tienda está en Bolivia (hora UTC-4).
 - `handoff_to_human`: para pasar con un asesor en reclamos, envíos o cuando lo pidan (incluye un resumen breve en el motivo).
 - `save_variable` + `complete_task`: cuando el cliente elige un modelo (ver esa sección).
@@ -49,7 +50,7 @@ system = (prompt + "\n" + HERRAMIENTAS
 texto = {"type": "string"}
 herramienta_buscar = {
     "name": "buscar_productos",
-    "description": ("Busca productos en americasportbolivia.com. Devuelve un enlace de sección verificado "
+    "description": ("Busca productos en americasportbolivia.com, o con `codigo` da el detalle de un modelo (colores y tallas). Devuelve un enlace de sección verificado "
                     "(con productos) y hasta 8 modelos con nombre, enlace y precios en Bs. Si no hay productos "
                     "con todos los filtros, quita los mínimos necesarios e indica cuáles (exacto=false)."),
     "function_id": FUNCION_BUSCAR_PRODUCTOS,
@@ -63,6 +64,7 @@ herramienta_buscar = {
             "tipo": {**texto, "description": "CALZADO, ROPA o ACCESORIOS"},
             "oferta": {"type": "boolean", "description": "true para ver solo ofertas"},
             "buscar": {**texto, "description": "Palabras del nombre del modelo, ej. 'air max', 'superstar'"},
+            "codigo": {**texto, "description": "Código de un modelo (ej. 14771). Si se envía, devuelve el detalle de ese modelo: nombre, precios, colores y tallas disponibles por color; los demás filtros se ignoran."},
         },
     },
 }
@@ -87,14 +89,25 @@ UI_SKILLS = [
                      "body: '¿Para quién es?' (puedes mencionar lo que busca). Botones (id → title): "
                      "hombre → 'Hombre', mujer → 'Mujer', ninos → 'Niños'. "
                      "Con la respuesta, llama a buscar_productos con ese genero (ninos = NIÑOS) y el tipo o producto elegido.")},
-    {"key": "carrusel_productos", "title": "Carrusel de productos", "component_type": "carousel_url",
+    {"key": "carrusel_productos", "title": "Carrusel de productos", "component_type": "carousel_quick_reply",
      "enabled": True, "wait_for_reply": False,
      "instruction": ("Para mostrar modelos después de llamar a buscar_productos, cuando devuelva 2 o más productos. "
-                     "Usa entre 2 y 5 productos de la respuesta, SOLO con sus datos reales: image_url = 'imagen', url = 'enlace', "
-                     "body de cada tarjeta = nombre + precio, ej. 'AIR MAX LONA C/PLATAFORMA\nBs 430 → oferta Bs 387' (máx. 160 caracteres), "
-                     "button = 'Ver modelo'. body del mensaje: una línea corta; si exacto=false, avisa que no hay el modelo exacto y "
-                     "que estas son opciones parecidas. Después envía el enlace_seccion como texto ('Ver todos: ...') y usa send_ui_seguir. "
-                     "Si hay solo 1 producto, envíalo como texto con su enlace.")},
+                     "Usa entre 2 y 5 productos de la respuesta, SOLO con sus datos reales: image_url = 'imagen', "
+                     "body de cada tarjeta = nombre + precio, ej. 'AIR MAX LONA C/PLATAFORMA\\nBs 430 → oferta Bs 387' (máx. 160 caracteres), "
+                     "button = 'Lo quiero', id = 'modelo_' + codigo (ej. 'modelo_14770'). body del mensaje: una línea corta "
+                     "que invite a tocar 'Lo quiero' en el modelo que le guste; si exacto=false, avisa que no hay el modelo exacto y "
+                     "que estas son opciones parecidas. Después envía como texto 'Ver todos: ' + enlace_seccion. "
+                     "Si hay solo 1 producto, envíalo como texto con su enlace y pregunta si lo quiere.")},
+    {"key": "elegir_color", "title": "Elegir color", "component_type": "interactive_list",
+     "enabled": True, "wait_for_reply": False,
+     "instruction": ("Cuando el modelo elegido tiene más de un color (según buscar_productos con codigo) y el cliente no dijo cuál. "
+                     "body: '¿En qué color lo quieres?'. button: 'Ver colores'. Una fila por color: id = 'color_' + código de color, "
+                     "title = nombre del color en español, description = tallas disponibles, ej. 'Tallas: 38, 39, 40'.")},
+    {"key": "elegir_talla", "title": "Elegir talla", "component_type": "interactive_list",
+     "enabled": True, "wait_for_reply": False,
+     "instruction": ("Cuando ya sabes el modelo (y el color, si tiene varios) pero no la talla. Usa SOLO las tallas que devolvió "
+                     "buscar_productos con codigo para ese color (máx. 10; si hay más, las 10 más cercanas a lo que pidió). "
+                     "body: '¿Qué talla necesitas?' + nombre del modelo. button: 'Ver tallas'. Filas: id = 'talla_' + talla, title = 'Talla ' + talla.")},
     {"key": "ubicacion_tienda", "title": "Ubicación de la tienda", "component_type": "location",
      "enabled": True, "wait_for_reply": False,
      "instruction": ("Cuando pregunten dónde está la tienda o elijan 'ubicacion'. Valores fijos: latitude -17.7854042, "
@@ -135,7 +148,7 @@ workflow = {"workflow": {
                  "temperature": 0.3,
                  "message_delivery_mode": "auto_send_assistant_text",
                  "enabled_default_tools": ["get_current_datetime", "handoff_to_human", "enter_waiting",
-                                           "get_whatsapp_context", "complete_task", "save_variable"],
+                                           "get_whatsapp_context", "complete_task", "save_variable", "ask_about_file"],
                  "flow_agent_function_tools": [herramienta_buscar],
                  "ui_skills": UI_SKILLS,
              }}},

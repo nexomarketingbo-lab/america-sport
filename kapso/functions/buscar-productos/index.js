@@ -68,10 +68,70 @@ async function consultar(filtros) {
   }
 }
 
+
+// Detalle de un modelo por código: nombre, precios, colores y tallas disponibles por color.
+async function obtenerHtml(url) {
+  for (let intento = 0; intento < 3; intento++) {
+    try {
+      const r = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0 (AmericaSportBot)" } });
+      const html = await r.text();
+      if (html.includes("Talla") || intento === 2) return html;
+    } catch (e) {
+      if (intento === 2) throw e;
+    }
+    await new Promise((res) => setTimeout(res, 800));
+  }
+}
+
+function tallasDe(html) {
+  const tallas = [];
+  const re = /index\.php\?codigo=\d+&color=[^&"]*&talla=([^"&]+)"/g;
+  let m;
+  while ((m = re.exec(html))) if (!tallas.includes(m[1])) tallas.push(decodeURIComponent(m[1]));
+  return tallas;
+}
+
+async function detalleProducto(codigo) {
+  const enlace = `${BASE}?codigo=${codigo}`;
+  const html = await obtenerHtml(enlace);
+  const nombre = ((html.match(/<h4>([^<]+)<\/h4>/) || [])[1] || "").trim();
+  if (!nombre) return { encontrado: false, enlace };
+  const dato = (etq) => ((html.match(new RegExp(`<strong>${etq}:</strong>\\s*([^<]+)<`)) || [])[1] || "").trim() || null;
+  const normal = (html.match(/Precio Normal:<\/strong>\s*(?:<span[^>]*>)?\s*([\d.,]+)/) || [])[1] || null;
+  const oferta = (html.match(/Precio Oferta:<\/strong>\s*([\d.,]+)/) || [])[1] || null;
+  const colores = [];
+  const reColor = /index\.php\?codigo=\d+&color=([^"&]+)" title="([^"]*)"/g;
+  let m;
+  while ((m = reColor.exec(html))) if (!colores.find((c) => c.color === m[1])) colores.push({ color: m[1] });
+  // Las tallas dependen del color: se consulta la página de cada color (máx. 5).
+  for (const c of colores.slice(0, 5)) {
+    try {
+      const h = colores.length === 1 ? html : await obtenerHtml(`${enlace}&color=${encodeURIComponent(c.color)}`);
+      c.tallas = tallasDe(h);
+      c.enlace = `${enlace}&color=${encodeURIComponent(c.color)}`;
+      c.imagen = `https://americasportbolivia.com/imagenes/${codigo}-${c.color}.jpg`;
+    } catch (_) { c.tallas = []; }
+  }
+  return {
+    encontrado: true, codigo, nombre, enlace,
+    marca: dato("Marca"), familia: dato("Familia"), deporte: dato("Deporte"), genero: dato("Genero"),
+    precio_normal_bs: normal, precio_oferta_bs: oferta,
+    imagen: `https://americasportbolivia.com/imagenes/${codigo}.jpg`,
+    colores,
+    nota: "Tallas y colores según la página web; el stock real lo confirma el encargado.",
+  };
+}
+
 async function handler(request, env) {
   let body = {};
   try { body = await request.json(); } catch (_) {}
   const input = body.input || body || {};
+
+  if (input.codigo) {
+    const codigo = String(input.codigo).replace(/\D/g, "");
+    const det = await detalleProducto(codigo).catch((e) => ({ encontrado: false, error: String(e) }));
+    return new Response(JSON.stringify({ modelo: det }), { headers: { "Content-Type": "application/json" } });
+  }
 
   const filtros = {};
   for (const campo of ["tipo", "familia", "grupo", "marca", "genero", "oferta"]) {

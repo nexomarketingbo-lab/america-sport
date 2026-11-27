@@ -20,4 +20,12 @@ for (const [input, exactoEsperado] of casos) {
   if (!ok) fallas++;
   console.log(ok ? "OK   " : "FALLA", JSON.stringify(input), "→", j.total_en_pagina, "productos", j.filtros_quitados.length ? `(quitó ${j.filtros_quitados})` : "", "|", j.productos[0]?.nombre ?? "-");
 }
+// Detalle por código: nombre, precios, colores y tallas
+for (const codigo of ["14771", "14810"]) {
+  const j = await (await handler(new Request("http://local", { method: "POST", body: JSON.stringify({ input: { codigo } }) }))).json();
+  const m = j.modelo;
+  const ok = m.encontrado && m.nombre && m.colores.length && m.colores.every((c) => c.tallas.length);
+  if (!ok) fallas++;
+  console.log(ok ? "OK   " : "FALLA", "codigo", codigo, "→", m.nombre, JSON.stringify(m.colores.map((c) => [c.color, c.tallas])));
+}
 process.exit(fallas ? 1 : 0);
