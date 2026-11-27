@@ -15,6 +15,8 @@ SEGUIMIENTO = ("¡Hola de nuevo! 👋 ¿Pudiste ver los modelos? Si te gustó al
                "y un encargado confirma si lo tenemos. Si buscas otra cosa, escríbeme y te ayudo 💪")
 NUMERO_TIENDA = "1362454746955581"        # +591 57358527 (America Sport)
 ENCARGADO = "59175389125"                 # recibe el aviso de cada modelo elegido
+# Plantilla "aviso_modelo_no_encontrado" (Meta 29440643932243165): poner aquí su id interno de Kapso cuando esté aprobada.
+PLANTILLA_AVISO_CONSULTA = None
 PLANTILLA_AVISO_ENCARGADO = "8223f293-6de1-4305-bb7a-e1caf35d5f0e"  # id Kapso de la plantilla "aviso_encargado_pedido" (Meta 1140906348851594)
 # La plantilla debe estar aprobada por Meta y sincronizada en Kapso antes de activar el aviso.
 USAR_AVISO = __import__("os").environ.get("USAR_AVISO", "1") == "1"
@@ -37,12 +39,19 @@ HERRAMIENTAS = """
 - `ask_about_file`: para ver fotos, capturas o archivos que mande el cliente (usa la URL que viene en su mensaje).
 - `get_current_datetime`: para saber si la tienda está abierta. La tienda está en Bolivia (hora UTC-4).
 - `handoff_to_human`: para pasar con un asesor en reclamos, envíos o cuando lo pidan (incluye un resumen breve en el motivo).
-- `save_variable` + `complete_task`: cuando el cliente elige un modelo (ver esa sección).
+- `save_variable` + `complete_task`: cuando el cliente elige un modelo, o pide uno que no existe (ver esas secciones).
 - `save_variable` (`siguiente` = `esperar`) + `complete_task`: después de CADA respuesta o pregunta al cliente, incluidas las de botones. No uses `enter_waiting`.
 - Formato WhatsApp: negritas con *un asterisco*, nada de tablas ni encabezados markdown. Envía los enlaces completos tal cual.
 """
 
-prompt = limpiar(leer("prompt-sistema.md")).replace(
+prompt = limpiar(leer("prompt-sistema.md"))
+if not PLANTILLA_AVISO_CONSULTA:
+    # Sin plantilla aprobada no hay aviso: no prometer que se avisó al personal.
+    prompt = prompt.replace(
+        '2. Avísale que vas a consultar con el personal: "Igual le pasé tu consulta al personal de la tienda por si lo tienen; si lo encuentran, te escriben por aquí 🙌".',
+        '2. Ofrécele hablar con un asesor por si lo tienen en tienda (botón "Hablar con asesor").')
+    prompt = prompt.replace('4. Guarda `siguiente` = `consulta` y llama a `complete_task` (en vez de `esperar`). Así se avisa al personal y la conversación sigue contigo.',
+                            '4. Guarda `siguiente` = `esperar` y llama a `complete_task`.').replace(
     "la sección ENLACES DEL CATÁLOGO", "la sección ENLACES DEL CATÁLOGO")
 system = (prompt + "\n" + HERRAMIENTAS
           + "\n\n=== DATOS DE LA TIENDA ===\n" + limpiar(leer("datos-tienda.md"))
@@ -66,6 +75,8 @@ herramienta_buscar = {
             "tipo": {**texto, "description": "CALZADO, ROPA o ACCESORIOS"},
             "oferta": {"type": "boolean", "description": "true para ver solo ofertas"},
             "buscar": {**texto, "description": "Palabras del nombre del modelo, ej. 'air max', 'superstar'"},
+            "precio_max": {"type": "number", "description": "Precio máximo en Bs (filtra por el precio de oferta), ej. 150 si el cliente dice 'hasta 150' o 'algo barato de 150'"},
+            "precio_min": {"type": "number", "description": "Precio mínimo en Bs"},
             "codigo": {**texto, "description": "Código de un modelo (ej. 14771). Si se envía, devuelve el detalle de ese modelo: nombre, precios, colores y tallas disponibles por color; los demás filtros se ignoran."},
         },
     },
@@ -76,7 +87,7 @@ UI_SKILLS = [
     {"key": "menu_principal", "title": "Menú principal", "component_type": "interactive_list",
      "enabled": True, "wait_for_reply": False,
      "instruction": ("En el primer mensaje de la conversación, cuando el cliente salude o pida ver opciones. "
-                     "body: el saludo de 'Primer mensaje'. button: 'Ver opciones'. Filas (id → title / description): "
+                     "body: el saludo de 'Primer mensaje' y al final, siempre, la línea '🛒 Catálogo completo: https://americasportbolivia.com'. button: 'Ver opciones'. Filas (id → title / description): "
                      "calzado → 'Calzado 👟' / 'Zapatillas, chuteras, sandalias y más'; "
                      "ropa → 'Ropa 👕' / 'Poleras, shorts, buzos, calzas'; "
                      "accesorios → 'Accesorios ⚽' / 'Pelotas, mochilas, gorras, guantes'; "
@@ -118,10 +129,19 @@ UI_SKILLS = [
     {"key": "seguir", "title": "Siguiente paso", "component_type": "interactive_reply_buttons",
      "enabled": True, "wait_for_reply": False,
      "instruction": ("Al terminar de mostrar productos o responder una consulta, para ofrecer el siguiente paso. "
-                     "body: pregunta corta, ej. '¿Te gustó alguno? Dime talla y color, o elige:'. Botones (id → title), elige 2 o 3: "
-                     "quiero_comprar → 'Quiero comprar', ver_mas → 'Ver más modelos', menu → 'Ver menú', asesor → 'Hablar con asesor'. "
-                     "quiero_comprar → sigue \"Cuando el cliente elige un modelo\"; ver_mas → pregunta qué cambiar "
-                     "(marca, deporte, precio) y vuelve a buscar; menu → send_ui_menu_principal; asesor → handoff_to_human.")},
+                     "body: pregunta corta. Botones (id → title), elige 2 o 3 que tengan sentido: "
+                     "ver_mas → 'Ver más modelos', menu → 'Ver menú', asesor → 'Hablar con asesor', quiero_comprar → 'Quiero comprar'. "
+                     "Después de un carrusel NO uses 'Quiero comprar' (el cliente ya tiene 'Lo quiero' en cada foto): usa ver_mas, menu y asesor. "
+                     "quiero_comprar sin modelo elegido → send_ui_elegir_modelo con los modelos que ya le mostraste; "
+                     "ver_mas → pregunta qué cambiar (marca, deporte, presupuesto) o busca la siguiente opción; "
+                     "menu → send_ui_menu_principal; asesor → handoff_to_human.")},
+    {"key": "elegir_modelo", "title": "Elegir modelo", "component_type": "interactive_list",
+     "enabled": True, "wait_for_reply": False,
+     "instruction": ("Cuando el cliente quiere comprar pero no dijo cuál modelo (ej. toca 'Quiero comprar' o escribe 'lo quiero' sin "
+                     "tocar una tarjeta). Usa los modelos que ya le mostraste en esta conversación (sus códigos están en los id "
+                     "'modelo_…' del carrusel). body: '¿Cuál de estos modelos quieres?'. button: 'Ver modelos'. Filas: id = 'modelo_' + codigo, "
+                     "title = nombre del modelo recortado a 24 caracteres, description = precio, ej. 'Bs 350 → oferta Bs 315'. "
+                     "Nunca le pidas que vuelva a buscar el carrusel de arriba.")},
 ]
 
 workflow = {"workflow": {
@@ -159,7 +179,9 @@ workflow = {"workflow": {
              "data": {"node_type": "decide", "display_name": "¿Eligió modelo?", "config": {
                  "decision_type": "function", "function_id": FUNCION_RUTA, "llm_configuration": {},
                  "conditions": [{"label": "pedido", "description": "El cliente eligió un modelo"},
-                                {"label": "esperar", "description": "Esperar la respuesta del cliente"}]}}},
+                                {"label": "esperar", "description": "Esperar la respuesta del cliente"},
+                                *([{"label": "consulta", "description": "Pidió un modelo que no existe: avisar al personal"}]
+                                  if PLANTILLA_AVISO_CONSULTA else [])]}}},
             {"id": "espera_1", "type": "flow-node", "position": {"x": 950, "y": 450},
              "data": {"node_type": "wait_for_response", "display_name": "Esperar respuesta (2 h)", "config": {
                  "has_timeout": True, "timeout_seconds": ESPERA_SEGUIMIENTO_SEG}}},
@@ -193,6 +215,18 @@ workflow = {"workflow": {
                         {"type": "text", "parameter_name": "enlace", "text": "{{vars.pedido_enlace}}"},
                     ]}],
                 }}}] if USAR_AVISO else []),
+            # Cliente pidió un modelo que no existe → avisar al personal y seguir la conversación.
+            *([{"id": "aviso_consulta", "type": "flow-node", "position": {"x": 1250, "y": 300},
+                "data": {"node_type": "send_template", "display_name": "Aviso: modelo no encontrado", "config": {
+                    "template_id": PLANTILLA_AVISO_CONSULTA,
+                    "phone_number_id": NUMERO_TIENDA,
+                    "to_phone_number": ENCARGADO,
+                    "parameters": [{"type": "BODY", "parameters": [
+                        {"type": "text", "parameter_name": "cliente", "text": "{{vars.cliente_nombre}}"},
+                        {"type": "text", "parameter_name": "telefono", "text": "+{{context.phone_number}}"},
+                        {"type": "text", "parameter_name": "busqueda", "text": "{{vars.consulta_busqueda}}"},
+                    ]}],
+                }}}] if PLANTILLA_AVISO_CONSULTA else []),
             {"id": "confirmar_stock", "type": "flow-node", "position": {"x": 1250, "y": 50},
              "data": {"node_type": "handoff", "display_name": "Encargado confirma stock", "config": {
                  "reason": "Cliente eligió un modelo: confirmar disponibilidad"}}},
@@ -205,6 +239,8 @@ workflow = {"workflow": {
                      {"source": "aviso_encargado", "target": "confirmar_stock", "label": "next"}] if USAR_AVISO
                     else [{"source": "ruta_agente", "target": "confirmar_stock", "label": "pedido"}]),
                   {"source": "ruta_agente", "target": "espera_1", "label": "esperar"},
+                  *([{"source": "ruta_agente", "target": "aviso_consulta", "label": "consulta"},
+                     {"source": "aviso_consulta", "target": "espera_1", "label": "next"}] if PLANTILLA_AVISO_CONSULTA else []),
                   {"source": "espera_1", "target": "ruta_espera_1", "label": "next"},
                   {"source": "ruta_espera_1", "target": "sporty", "label": "respondio"},
                   {"source": "ruta_espera_1", "target": "seguimiento", "label": "sin_respuesta"},

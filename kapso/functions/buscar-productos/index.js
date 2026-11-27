@@ -5,11 +5,15 @@
 
 const BASE = "https://americasportbolivia.com/index.php";
 const MAX_PRODUCTOS = 8;
-const ORDEN_RELAJAR = ["grupo", "genero", "marca", "tipo", "oferta"]; // "familia" se conserva
+const ORDEN_RELAJAR = ["grupo", "genero", "marca", "tipo", "oferta", "pmin", "pmax"]; // "familia" se conserva; el precio se quita al final
 
 function normalizar(campo, valor) {
   if (valor === undefined || valor === null || valor === "" || valor === false) return null;
   if (campo === "oferta") return "1";
+  if (campo === "pmin" || campo === "pmax") {
+    const n = parseFloat(String(valor).replace(",", ".").replace(/[^\d.]/g, ""));
+    return Number.isFinite(n) && n > 0 ? String(Math.round(n)) : null;
+  }
   let v = String(valor).trim().toUpperCase()
     .normalize("NFD").replace(/[̀-̂̄-ͯ]/g, "").normalize("NFC");
   if (campo === "genero") {
@@ -134,8 +138,9 @@ async function handler(request, env) {
   }
 
   const filtros = {};
-  for (const campo of ["tipo", "familia", "grupo", "marca", "genero", "oferta"]) {
-    const v = normalizar(campo, input[campo]);
+  const entrada = { ...input, pmin: input.precio_min, pmax: input.precio_max };
+  for (const campo of ["tipo", "familia", "grupo", "marca", "genero", "oferta", "pmin", "pmax"]) {
+    const v = normalizar(campo, entrada[campo]);
     if (v) filtros[campo] = v;
   }
   const buscar = input.buscar ? String(input.buscar).trim().toUpperCase() : null;

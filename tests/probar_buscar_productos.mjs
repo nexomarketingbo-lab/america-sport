@@ -11,12 +11,18 @@ const casos = [
   [{ marca: "new balance", familia: "zapatillas" }, true],
   [{ marca: "nike", buscar: "air max" }, true],
   [{ grupo: "basquet", familia: "pelotas" }, true],
+  [{ familia: "zapatillas", precio_max: 100 }, true],
+  [{ familia: "zapatillas", precio_min: 100, precio_max: 150 }, true],
 ];
 let fallas = 0;
 for (const [input, exactoEsperado] of casos) {
   const r = await handler(new Request("http://local", { method: "POST", body: JSON.stringify({ input }) }));
   const j = await r.json();
-  const ok = j.hay_productos && j.exacto === exactoEsperado && j.productos.every((p) => p.enlace.includes("codigo="));
+  const precioOk = j.productos.every((p) => {
+    const v = parseFloat(p.precio_oferta_bs || p.precio_normal_bs);
+    return (!input.precio_max || v <= input.precio_max) && (!input.precio_min || v >= input.precio_min);
+  });
+  const ok = j.hay_productos && j.exacto === exactoEsperado && precioOk && j.productos.every((p) => p.enlace.includes("codigo="));
   if (!ok) fallas++;
   console.log(ok ? "OK   " : "FALLA", JSON.stringify(input), "→", j.total_en_pagina, "productos", j.filtros_quitados.length ? `(quitó ${j.filtros_quitados})` : "", "|", j.productos[0]?.nombre ?? "-");
 }
