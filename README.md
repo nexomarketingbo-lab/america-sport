@@ -38,7 +38,7 @@ Contenido del asistente virtual de **America Sport** (tienda de ropa deportiva) 
 
 El agente **"America Sport - Asistente WhatsApp"** (slug `america-sport-asistente`) está **activo** en Kapso, en el número **+591 57358527**.
 
-- Workflow: Inicio → agente IA "Asistente de America Sport" (Claude Sonnet 5.5) → *(cliente elige un modelo)* → **aviso al encargado** (+591 75389125) → **pasa a humano** para confirmar stock.
+- Workflow: Inicio → agente IA "Asistente de America Sport" (Claude Haiku 5.5, el modelo más económico) → *(cliente elige un modelo)* → **aviso al encargado** (+591 75389125) → **pasa a humano** para confirmar stock.
 - **Seguimiento:** después de cada respuesta del asistente, el flujo espera. Si el cliente no contesta en **2 h**, se le manda un mensaje de seguimiento (uno solo); si sigue sin contestar 20 h más, la conversación se cierra. Tiempos y texto en `kapso/build_workflow.py` (`ESPERA_SEGUIMIENTO_SEG`, `SEGUIMIENTO`). La función `kapso/functions/ruta-conversacion` decide cada camino.
 - **Aviso al encargado:** plantilla de Meta `aviso_encargado_pedido` (cliente, teléfono, modelo, talla/color, enlace). Aprobada por Meta y activa. El nodo usa el id interno de Kapso de la plantilla (`PLANTILLA_AVISO_ENCARGADO`), que se obtiene agregando un nodo "Send template" en el lienzo y leyendo la definición.
 - **Atiende a todos los clientes** en +591 57358527. El filtro de números de prueba (`kapso/functions/filtro-numeros/index.js`) está desactivado; se vuelve a poner con `USAR_FILTRO=1 python3 kapso/build_workflow.py`.

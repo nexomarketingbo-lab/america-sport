@@ -6,6 +6,8 @@ import json, re, pathlib
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 MODELO_CLAUDE_SONNET_5_5 = "1caa3ea4-b319-462b-abae-025bcfdd8cf1"
+MODELO_CLAUDE_HAIKU_5_5 = "7c2cc054-60af-4ca8-aa15-030db79ce9db"  # el más económico (~17x más barato que Sonnet 5.5)
+MODELO = MODELO_CLAUDE_HAIKU_5_5
 FUNCION_BUSCAR_PRODUCTOS = "6e5893e1-577b-4bd7-b198-76271747851f"
 FUNCION_FILTRO_NUMEROS = "8305cf42-2f0f-4a87-816e-9599d4303de2"  # kapso/functions/filtro-numeros
 FUNCION_RUTA = "a6626bfa-4bfc-444d-ab76-8c91c5fcd10b"   # kapso/functions/ruta-conversacion
@@ -168,7 +170,7 @@ workflow = {"workflow": {
             {"id": "sporty", "type": "flow-node", "position": {"x": 650, "y": 50},
              "data": {"node_type": "agent", "display_name": "Asistente de America Sport (IA)", "config": {
                  "system_prompt": system,
-                 "provider_model_id": MODELO_CLAUDE_SONNET_5_5,
+                 "provider_model_id": MODELO,
                  "temperature": 0.3,
                  "message_delivery_mode": "auto_send_assistant_text",
                  "enabled_default_tools": ["get_current_datetime", "handoff_to_human", "enter_waiting",
