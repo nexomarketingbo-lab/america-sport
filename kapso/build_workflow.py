@@ -7,6 +7,7 @@ import json, re, pathlib
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 MODELO_CLAUDE_SONNET_5_5 = "1caa3ea4-b319-462b-abae-025bcfdd8cf1"
 FUNCION_BUSCAR_PRODUCTOS = "6e5893e1-577b-4bd7-b198-76271747851f"
+FUNCION_FILTRO_NUMEROS = "8305cf42-2f0f-4a87-816e-9599d4303de2"  # kapso/functions/filtro-numeros
 
 def leer(nombre):
     return (ROOT / "chatbot" / nombre).read_text(encoding="utf-8")
@@ -63,7 +64,18 @@ workflow = {"workflow": {
         "nodes": [
             {"id": "start", "type": "flow-node", "position": {"x": 100, "y": 100},
              "data": {"node_type": "start", "config": {}, "display_name": "Inicio"}},
-            {"id": "sporty", "type": "flow-node", "position": {"x": 400, "y": 100},
+            # Solo los números de kapso/functions/filtro-numeros pasan al agente.
+            {"id": "filtro_numeros", "type": "flow-node", "position": {"x": 350, "y": 100},
+             "data": {"node_type": "decide", "display_name": "Filtro de números", "config": {
+                 "decision_type": "function",
+                 "function_id": FUNCION_FILTRO_NUMEROS,
+                 "conditions": [
+                     {"label": "autorizado", "description": "El número está en la lista permitida"},
+                     {"label": "no_autorizado", "description": "Cualquier otro número: no se responde"},
+                 ],
+                 "llm_configuration": {},
+             }}},
+            {"id": "sporty", "type": "flow-node", "position": {"x": 650, "y": 50},
              "data": {"node_type": "agent", "display_name": "Sporty (agente IA)", "config": {
                  "system_prompt": system,
                  "provider_model_id": MODELO_CLAUDE_SONNET_5_5,
@@ -74,7 +86,8 @@ workflow = {"workflow": {
                  "flow_agent_function_tools": [herramienta_buscar],
              }}},
         ],
-        "edges": [{"source": "start", "target": "sporty", "label": "next"}],
+        "edges": [{"source": "start", "target": "filtro_numeros", "label": "next"},
+                  {"source": "filtro_numeros", "target": "sporty", "label": "autorizado"}],
     },
 }}
 

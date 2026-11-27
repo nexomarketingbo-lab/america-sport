@@ -38,7 +38,8 @@ Contenido del asistente virtual de **America Sport** (tienda de ropa deportiva) 
 
 El agente **"America Sport - Asistente WhatsApp"** (slug `america-sport-asistente`) está creado en Kapso como **borrador**.
 
-- Workflow: Inicio → agente IA "Sporty" (Claude Sonnet 5.5).
+- Workflow: Inicio → **filtro de números** → agente IA "Sporty" (Claude Sonnet 5.5).
+- **Filtro de números** (`kapso/functions/filtro-numeros/index.js`): por ahora el bot solo responde a **+591 77213515** y **+591 72181658**. Otros números no reciben respuesta automática (sus mensajes quedan en la bandeja de Kapso). Para abrirlo a todos los clientes, quitar el nodo del filtro en `kapso/build_workflow.py` o editar la lista y volver a publicar la función.
 - Herramientas: `buscar_productos` (función propia), hora actual, pasar con un humano, esperar al cliente y contexto de WhatsApp.
 - El prompt, los datos, los enlaces y las preguntas frecuentes van en las instrucciones del agente.
 
@@ -57,6 +58,7 @@ Código en `kapso/functions/buscar-productos/index.js` (Kapso Function, Cloudfla
 ### Pruebas
 - `python3 tests/verificar_enlaces.py` → datos clave del prompt y enlaces del catálogo.
 - `node tests/probar_buscar_productos.mjs` → función de búsqueda contra la web real.
+- `node tests/probar_filtro_numeros.mjs` → filtro de números.
 
 ### Activarlo
 En Kapso: abrir el workflow → agregar el disparador *Inbound message* con el número de WhatsApp → activar. Probar primero con el número sandbox.
