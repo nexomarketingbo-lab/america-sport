@@ -4,7 +4,7 @@
 Mensaje del cliente
         │
         ▼
- ¿Primer mensaje? ──sí──► Saludo + menú
+ ¿Primer mensaje? ──sí──► Saludo + lista "Ver opciones"
         │no
         ▼
  Detectar intención
