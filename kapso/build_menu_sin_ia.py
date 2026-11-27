@@ -37,6 +37,11 @@ UBICACION = ("📍 *America Sport*\nCalle Colón #130, Santa Cruz de la Sierra\n
 ASESOR = f"¡Gracias por escribirnos! 🙌 Enseguida un asesor de America Sport se comunicará contigo.\n{HORARIO}"
 SEGUIMIENTO = ("¡Hola de nuevo! 👋 ¿Encontraste lo que buscabas? Si te gustó algún modelo, mándanos la captura o el enlace "
                "con tu talla y un asesor te confirma. Escribe *menú* para ver las opciones.")
+ANUNCIO = ("👟 ¡Hola! Gracias por escribir a *America Sport*. Aquí están los tenis del anuncio y todos nuestros modelos "
+           f"de zapatillas, con precios y tallas:\n{B}?familia=ZAPATILLAS\n\n"
+           f"👕 Si buscas poleras: {B}?familia=POLERAS\n\n"
+           "Si te gusta algún modelo, mándanos la *captura o el enlace* con tu talla y un asesor te confirma 🙌\n"
+           "Escribe *menú* para ver más opciones.")
 MENU = ("¡Hola! 👋 Bienvenido a *America Sport*. ¿Qué estás buscando hoy?\n\n"
         f"🛒 Catálogo completo: {WEB}\n\nElige una opción o escríbenos tu consulta y un asesor te atiende.")
 
@@ -55,6 +60,12 @@ etiquetas = [s[0] for s in SECCIONES] + ["ubicacion", "asesor", "menu", "sin_res
 
 nodes = [
     nodo("start", "start", 0, 300, "Inicio", {}),
+    # ¿El primer mensaje es el texto predeterminado del anuncio (video de tenis)?
+    nodo("ruta_inicio", "decide", 120, 450, "¿Viene del anuncio?", {
+        "decision_type": "function", "function_id": FUNCION_MENU, "llm_configuration": {},
+        "conditions": [{"label": "anuncio", "description": "Mensaje predeterminado del anuncio"},
+                       {"label": "menu", "description": "Cualquier otro primer mensaje"}]}),
+    texto("t_anuncio", 250, 560, "Respuesta al anuncio (tenis)", ANUNCIO),
     nodo("menu", "send_interactive", 250, 300, "Menú", {
         "interactive_type": "list", "body_text": MENU, "list_button_text": "Ver opciones",
         "list_sections": [{"title": "America Sport", "rows": filas}]}),
@@ -78,7 +89,10 @@ nodes = [
     nodo("pasar_a_humano", "handoff", 1650, 820, "Pasa a un asesor", {"reason": "Consulta para un asesor"}),
 ]
 edges = [
-    {"source": "start", "target": "menu", "label": "next"},
+    {"source": "start", "target": "ruta_inicio", "label": "next"},
+    {"source": "ruta_inicio", "target": "t_anuncio", "label": "anuncio"},
+    {"source": "ruta_inicio", "target": "menu", "label": "menu"},
+    {"source": "t_anuncio", "target": "espera", "label": "next"},
     {"source": "menu", "target": "espera", "label": "next"},
     {"source": "espera", "target": "ruta", "label": "next"},
     *[{"source": "ruta", "target": f"t_{s[0]}", "label": s[0]} for s in SECCIONES],

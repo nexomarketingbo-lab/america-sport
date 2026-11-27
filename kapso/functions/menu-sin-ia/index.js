@@ -3,8 +3,11 @@
 // - "menú", "hola", "inicio"… → volver a mostrar el menú.
 // - Cualquier otra cosa (texto, foto, audio, enlace) → "asesor": avisa al encargado y pasa a humano.
 // - Sin respuesta (timeout de la espera) → un seguimiento; si ya hubo uno → "cerrar".
+// - Al inicio (edges: anuncio / menu): el mensaje predeterminado del anuncio → "anuncio" (tenis).
 
 const OPCIONES = ["calzado_hombre", "calzado_mujer", "calzado_ninos", "ropa", "accesorios", "ofertas", "ubicacion", "asesor"];
+// Texto predeterminado del anuncio de Meta (el video muestra tenis): se responde con zapatillas.
+const MENSAJE_ANUNCIO = /modelos de poleras disponibles/i;
 const VOLVER_AL_MENU = /^(men[uú]|hola|holi|buenas|buen[oa]s (d[ií]as|tardes|noches)|inicio|opciones|volver)(?=$|[\s!.,?¡¿])/iu;
 
 function limpiar(texto) {
@@ -36,6 +39,13 @@ async function handler(request, env) {
   const body = await request.json().catch(() => ({}));
   const edges = body.available_edges || [];
   const vars = (body.execution_context && body.execution_context.vars) || {};
+
+  // Primer mensaje de la conversación: ¿viene del anuncio?
+  if (edges.includes("anuncio")) {
+    const m = ultimoMensajeDelCliente(body);
+    const t = (m && m.content) || vars.last_user_input || "";
+    return responder(MENSAJE_ANUNCIO.test(t) ? "anuncio" : "menu");
+  }
 
   if (motivoReanudacion(body) === "timeout") {
     const n = Number(vars.seguimientos || 0);

@@ -19,6 +19,48 @@
           }
         },
         {
+          "id": "ruta_inicio",
+          "type": "flow-node",
+          "position": {
+            "x": 120,
+            "y": 450
+          },
+          "data": {
+            "node_type": "decide",
+            "display_name": "¿Viene del anuncio?",
+            "config": {
+              "decision_type": "function",
+              "function_id": "d2535f06-f55f-40d3-8f70-4c737b13e65a",
+              "llm_configuration": {},
+              "conditions": [
+                {
+                  "label": "anuncio",
+                  "description": "Mensaje predeterminado del anuncio"
+                },
+                {
+                  "label": "menu",
+                  "description": "Cualquier otro primer mensaje"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "t_anuncio",
+          "type": "flow-node",
+          "position": {
+            "x": 250,
+            "y": 560
+          },
+          "data": {
+            "node_type": "send_text",
+            "display_name": "Respuesta al anuncio (tenis)",
+            "config": {
+              "message": "👟 ¡Hola! Gracias por escribir a *America Sport*. Aquí están los tenis del anuncio y todos nuestros modelos de zapatillas, con precios y tallas:\nhttps://americasportbolivia.com/index.php?familia=ZAPATILLAS\n\n👕 Si buscas poleras: https://americasportbolivia.com/index.php?familia=POLERAS\n\nSi te gusta algún modelo, mándanos la *captura o el enlace* con tu talla y un asesor te confirma 🙌\nEscribe *menú* para ver más opciones."
+            }
+          }
+        },
+        {
           "id": "menu",
           "type": "flow-node",
           "position": {
@@ -364,7 +406,22 @@
       "edges": [
         {
           "source": "start",
+          "target": "ruta_inicio",
+          "label": "next"
+        },
+        {
+          "source": "ruta_inicio",
+          "target": "t_anuncio",
+          "label": "anuncio"
+        },
+        {
+          "source": "ruta_inicio",
           "target": "menu",
+          "label": "menu"
+        },
+        {
+          "source": "t_anuncio",
+          "target": "espera",
           "label": "next"
         },
         {
