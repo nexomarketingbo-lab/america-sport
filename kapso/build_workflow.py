@@ -206,7 +206,7 @@ workflow = {"workflow": {
                     "to_phone_number": ENCARGADO,
                     "parameters": [{"type": "BODY", "parameters": [
                         {"type": "text", "parameter_name": "cliente", "text": "{{vars.cliente_nombre}}"},
-                        {"type": "text", "parameter_name": "telefono", "text": "+{{context.phone_number}}"},
+                        {"type": "text", "parameter_name": "telefono", "text": "+{{context.phone_number}} · Escríbele: https://wa.me/{{context.phone_number}}"},
                         {"type": "text", "parameter_name": "modelo", "text": "{{vars.pedido_modelo}}"},
                         {"type": "text", "parameter_name": "detalle", "text": "{{vars.pedido_detalle}}"},
                         {"type": "text", "parameter_name": "enlace", "text": "{{vars.pedido_enlace}}"},
@@ -221,11 +221,11 @@ workflow = {"workflow": {
                    "to_phone_number": ENCARGADO,
                    "parameters": [{"type": "BODY", "parameters": (
                        [{"type": "text", "parameter_name": "cliente", "text": "{{vars.cliente_nombre}}"},
-                        {"type": "text", "parameter_name": "telefono", "text": "+{{context.phone_number}}"},
+                        {"type": "text", "parameter_name": "telefono", "text": "+{{context.phone_number}} · Escríbele: https://wa.me/{{context.phone_number}}"},
                         {"type": "text", "parameter_name": "busqueda", "text": "{{vars.consulta_busqueda}}"}]
                        if PLANTILLA_AVISO_CONSULTA and nid == "aviso_consulta" else
                        [{"type": "text", "parameter_name": "cliente", "text": "{{vars.cliente_nombre}}"},
-                        {"type": "text", "parameter_name": "telefono", "text": "+{{context.phone_number}}"},
+                        {"type": "text", "parameter_name": "telefono", "text": "+{{context.phone_number}} · Escríbele: https://wa.me/{{context.phone_number}}"},
                         {"type": "text", "parameter_name": "modelo", "text": "Consulta: {{vars.consulta_busqueda}}"},
                         {"type": "text", "parameter_name": "detalle", "text": "Ver el chat"},
                         {"type": "text", "parameter_name": "enlace", "text": "https://americasportbolivia.com"}])}],

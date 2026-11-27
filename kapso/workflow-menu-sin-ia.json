@@ -359,12 +359,12 @@
                     {
                       "type": "text",
                       "parameter_name": "cliente",
-                      "text": "Cliente"
+                      "text": "{{vars.cliente_nombre}}"
                     },
                     {
                       "type": "text",
                       "parameter_name": "telefono",
-                      "text": "+{{context.phone_number}}"
+                      "text": "+{{context.phone_number}} · Escríbele: https://wa.me/{{context.phone_number}}"
                     },
                     {
                       "type": "text",

@@ -82,8 +82,8 @@ nodes = [
     nodo("aviso_encargado", "send_template", 1350, 820, "Aviso al encargado", {
         "template_id": PLANTILLA_AVISO_ENCARGADO, "phone_number_id": NUMERO_TIENDA, "to_phone_number": ENCARGADO,
         "parameters": [{"type": "BODY", "parameters": [
-            {"type": "text", "parameter_name": "cliente", "text": "Cliente"},
-            {"type": "text", "parameter_name": "telefono", "text": "+{{context.phone_number}}"},
+            {"type": "text", "parameter_name": "cliente", "text": "{{vars.cliente_nombre}}"},
+            {"type": "text", "parameter_name": "telefono", "text": "+{{context.phone_number}} · Escríbele: https://wa.me/{{context.phone_number}}"},
             {"type": "text", "parameter_name": "modelo", "text": "Consulta: {{vars.aviso_mensaje}}"},
             {"type": "text", "parameter_name": "detalle", "text": "Ver el chat"},
             {"type": "text", "parameter_name": "enlace", "text": WEB},

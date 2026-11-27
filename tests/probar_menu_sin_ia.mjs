@@ -3,7 +3,7 @@ import fs from "node:fs";
 const code = fs.readFileSync(new URL("../kapso/functions/menu-sin-ia/index.js", import.meta.url), "utf8");
 const handler = new Function(`${code}; return handler;`)();
 const edges = ["calzado_hombre", "calzado_mujer", "calzado_ninos", "ropa", "accesorios", "ofertas", "ubicacion", "asesor", "menu", "sin_respuesta", "cerrar"];
-const msg = (m) => ({ available_edges: edges, whatsapp_context: { messages: [{ direction: "outbound", content: "menu" }, { direction: "inbound", ...m }] } });
+const msg = (m) => ({ available_edges: edges, whatsapp_context: { conversation: { contact_name: "Juan Pérez" }, messages: [{ direction: "outbound", content: "menu" }, { direction: "inbound", ...m }] } });
 const casos = [
   [msg({ content: "Selected: Calzado hombre", reply_option_id: "calzado_hombre" }), "calzado_hombre"],
   [msg({ content: "Selected: Ofertas", reply_option_id: "ofertas" }), "ofertas"],
@@ -21,6 +21,6 @@ let fallas = 0;
 for (const [body, esperado] of casos) {
   const j = await (await handler(new Request("http://l", { method: "POST", body: JSON.stringify(body) }))).json();
   const ok = j.next_edge === esperado; if (!ok) fallas++;
-  console.log(ok ? "OK   " : "FALLA", esperado.padEnd(15), "→", j.next_edge, j.vars && j.vars.aviso_mensaje ? `| aviso: "${j.vars.aviso_mensaje}"` : "");
+  console.log(ok ? "OK   " : "FALLA", esperado.padEnd(15), "→", j.next_edge, j.vars && j.vars.aviso_mensaje ? `| aviso: "${j.vars.aviso_mensaje}" de ${j.vars.cliente_nombre}` : "");
 }
 process.exit(fallas ? 1 : 0);

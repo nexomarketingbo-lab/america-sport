@@ -30,6 +30,12 @@ function motivoReanudacion(body) {
   return (sys.last_resume && sys.last_resume.reason) || sys.last_resume_reason || null;
 }
 
+function nombreDelCliente(body) {
+  const conv = (body.whatsapp_context && body.whatsapp_context.conversation) || {};
+  const n = conv.contact_name || (conv.contact && conv.contact.name) || "";
+  return limpiar(n).slice(0, 60) === "[mensaje sin texto]" || !n ? "Cliente" : limpiar(n).slice(0, 60);
+}
+
 function responder(next_edge, vars) {
   return new Response(JSON.stringify(vars ? { next_edge, vars } : { next_edge }), {
     headers: { "Content-Type": "application/json" },
@@ -56,11 +62,11 @@ async function handler(request, env) {
   const msg = ultimoMensajeDelCliente(body);
   const opcion = msg && msg.reply_option_id;
   if (opcion && OPCIONES.includes(opcion) && edges.includes(opcion)) {
-    return responder(opcion, { seguimientos: 0, ...(opcion === "asesor" ? { aviso_mensaje: "Pidió hablar con un asesor" } : {}) });
+    return responder(opcion, { seguimientos: 0, ...(opcion === "asesor" ? { aviso_mensaje: "Pidió hablar con un asesor", cliente_nombre: nombreDelCliente(body) } : {}) });
   }
 
   const texto = (msg && msg.content) || vars.last_user_input || "";
   if (VOLVER_AL_MENU.test(String(texto).trim())) return responder("menu", { seguimientos: 0 });
 
-  return responder("asesor", { seguimientos: 0, aviso_mensaje: limpiar(texto) });
+  return responder("asesor", { seguimientos: 0, aviso_mensaje: limpiar(texto), cliente_nombre: nombreDelCliente(body) });
 }
